@@ -1,7 +1,7 @@
 {
-  "name": "discord-clone-backend",
+  "name": "nexus-backend",
   "version": "1.0.0",
-  "description": "Backend for Discord Clone Chat Application",
+  "description": "Backend for Nexus Real-time Collaboration Platform",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -12,7 +12,7 @@
     "migrate:help": "node migrate-cli.js help",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["chat", "websocket", "api"],
+  "keywords": ["nexus", "collaboration", "real-time", "messaging", "websocket", "api"],
   "author": "",
   "license": "ISC",
   "type": "commonjs",

@@ -1,7 +1,7 @@
 {
-  "name": "discord-clone",
+  "name": "nexus",
   "version": "1.0.0",
-  "description": "",
+  "description": "A real-time collaboration and messaging platform",
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
@@ -13,7 +13,7 @@
     "docker:build": "docker-compose build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": ["nexus", "collaboration", "real-time", "messaging", "platform"],
   "author": "",
   "license": "ISC",
   "type": "commonjs",

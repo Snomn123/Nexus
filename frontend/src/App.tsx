@@ -45,12 +45,12 @@ const AuthScreen: React.FC = () => {
   );
 };
 
-interface DiscordInterfaceProps {
+interface NexusInterfaceProps {
   currentView: 'server' | 'dms' | 'friends';
   onViewChange: (view: 'server' | 'dms' | 'friends') => void;
 }
 
-const DiscordInterface: React.FC<DiscordInterfaceProps> = ({ currentView, onViewChange }) => {
+const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChange }) => {
   const [servers, setServers] = useState<Server[]>([]);
   const [activeServer, setActiveServer] = useState<Server | null>(null);
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
@@ -433,7 +433,7 @@ const DiscordInterface: React.FC<DiscordInterfaceProps> = ({ currentView, onView
                   {user?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
                 </span>
               </div>
-              {/* Status Orb - positioned like Discord */}
+              {/* Status Orb - positioned for optimal visibility */}
               <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-gray-800 ${
                 connected ? 'bg-green-500' : 'bg-yellow-500'
               }`}></div>
@@ -615,7 +615,7 @@ const AppContent: React.FC = () => {
     return (
       <div className="h-screen bg-discord-darkest text-white flex items-center justify-center">
         <div className="text-center">
-          <div className="text-xl font-bold mb-2">Discord Clone</div>
+          <div className="text-xl font-bold mb-2">Nexus</div>
           <div className="text-gray-400">Loading...</div>
         </div>
       </div>
@@ -630,7 +630,7 @@ const AppContent: React.FC = () => {
     <SocketProvider>
       <FriendsProvider>
         <DMProvider onSwitchToDMs={handleSwitchToDMs}>
-          <DiscordInterface currentView={currentView} onViewChange={setCurrentView} />
+          <NexusInterface currentView={currentView} onViewChange={setCurrentView} />
         </DMProvider>
       </FriendsProvider>
     </SocketProvider>

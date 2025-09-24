@@ -17,9 +17,9 @@ module.exports = {
         'nexus-accent': '#10b981',
         'nexus-warning': '#f59e0b',
         'nexus-error': '#ef4444',
-        // Keep Discord colors for gradual transition
+        // Legacy dark theme colors (maintained for compatibility)
         'discord-dark': '#36393f',
-        'discord-darker': '#2f3136',
+        'discord-darker': '#2f3136', 
         'discord-darkest': '#202225',
         'discord-blue': '#5865f2',
         'discord-green': '#57f287',

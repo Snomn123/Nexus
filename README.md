@@ -1,20 +1,21 @@
-# Discord Clone
+# Nexus
 
-A full-stack Discord-like chat application built with React, Node.js, PostgreSQL, Redis, and Socket.IO.
+A full-stack real-time collaboration and messaging platform built with React, Node.js, PostgreSQL, Redis, and Socket.IO.
 
 ## Features
 
-- **Real-time messaging** with Socket.IO
+- **Real-time messaging** and collaboration with Socket.IO
 - **User authentication** with JWT and HTTP-only cookies
-- **Server and channel management** 
+- **Workspace and channel management** 
 - **User presence** and online status
+- **Direct messaging** and group conversations
 - **Message replies** and editing
-- **Typing indicators**
+- **Typing indicators** for enhanced user experience
 - **Secure password hashing** with bcrypt
-- **Redis caching** for performance
+- **Redis caching** for optimal performance
 - **PostgreSQL database** with proper relationships
-- **Responsive UI** with TailwindCSS
-- **TypeScript** for type safety
+- **Modern responsive UI** with TailwindCSS and Nexus design system
+- **TypeScript** for type safety and better development experience
 
 ## Tech Stack
 
@@ -47,7 +48,7 @@ A full-stack Discord-like chat application built with React, Node.js, PostgreSQL
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd discord-clone
+   cd nexus
    ```
 
 2. **Start the databases with Docker**
@@ -79,7 +80,7 @@ FRONTEND_URL=http://localhost:3000
 
 DB_HOST=localhost
 DB_PORT=5432
-DB_NAME=discord_clone
+DB_NAME=nexus
 DB_USER=postgres
 DB_PASSWORD=password
 
@@ -101,7 +102,7 @@ REACT_APP_SOCKET_URL=http://localhost:5000
 The database schema will be automatically applied when you start the PostgreSQL container. You can also manually apply it:
 
 ```bash
-docker exec -i discord_clone_postgres psql -U postgres -d discord_clone < backend/schema.sql
+docker exec -i nexus_postgres psql -U postgres -d nexus < backend/schema.sql
 ```
 
 ### Running the Application
@@ -165,7 +166,7 @@ docker exec -i discord_clone_postgres psql -U postgres -d discord_clone < backen
 
 ### Tables
 - **users** - User accounts and profiles
-- **servers** - Discord servers/guilds
+- **servers** - Nexus workspaces/servers
 - **server_members** - Many-to-many relationship between users and servers
 - **channels** - Text and voice channels within servers
 - **messages** - Chat messages with reply support
@@ -193,7 +194,7 @@ npm run eject       # Eject from Create React App
 ## Project Structure
 
 ```
-discord-clone/
+nexus/
 ├── backend/
 │   ├── src/
 │   │   ├── config/         # Database and app configuration
@@ -252,6 +253,7 @@ This project is licensed under the MIT License.
 
 ## Acknowledgments
 
-- Inspired by Discord's user interface and functionality
+- Inspired by modern real-time collaboration platforms
 - Built with modern web development best practices
 - Uses industry-standard security and performance optimizations
+- Designed for seamless team communication and collaboration

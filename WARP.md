@@ -1,6 +1,6 @@
 # WARP.md
 
-This file provides guidance to WARP (warp.dev) when working with code in this repository.
+This file provides guidance to WARP (warp.dev) when working with code in the Nexus repository.
 
 ## Development Commands
 
@@ -39,7 +39,7 @@ npm run start
 cd backend && nodemon src/server.js
 
 # Apply database schema manually
-docker exec -i discord_clone_postgres psql -U postgres -d discord_clone < backend/schema.sql
+docker exec -i nexus_postgres psql -U postgres -d nexus < backend/schema.sql
 ```
 
 ### Frontend Commands
@@ -60,10 +60,10 @@ cd frontend && npm test
 # Navigate to http://localhost:8080
 
 # Connect to PostgreSQL directly
-docker exec -it discord_clone_postgres psql -U postgres -d discord_clone
+docker exec -it nexus_postgres psql -U postgres -d nexus
 
 # Connect to Redis CLI
-docker exec -it discord_clone_redis redis-cli
+docker exec -it nexus_redis redis-cli
 
 # View container logs
 docker-compose logs postgres
@@ -73,7 +73,7 @@ docker-compose logs redis
 ## Architecture Overview
 
 ### Project Structure
-This is a full-stack Discord clone with a **monorepo structure** containing separate `backend/` and `frontend/` directories, each with their own dependencies.
+This is a full-stack Nexus collaboration platform with a **monorepo structure** containing separate `backend/` and `frontend/` directories, each with their own dependencies.
 
 ### Backend Architecture (Node.js/Express)
 - **Server**: Express server with Socket.IO for real-time communication
@@ -106,7 +106,7 @@ This is a full-stack Discord clone with a **monorepo structure** containing sepa
 ### Database Schema
 **Core Tables:**
 - `users` - User accounts with status tracking
-- `servers` - Discord-like server/guild entities with invite codes
+- `servers` - Nexus workspace/server entities with invite codes
 - `server_members` - Many-to-many user-server relationships with roles
 - `channels` - Text/voice channels within servers
 - `messages` - Chat messages with reply threading support

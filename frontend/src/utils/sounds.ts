@@ -1,4 +1,4 @@
-// Sound utility functions for Discord clone
+// Sound utility functions for Nexus
 
 class SoundManager {
   private audioContext: AudioContext | null = null;
