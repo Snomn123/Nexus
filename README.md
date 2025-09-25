@@ -42,24 +42,91 @@ A full-stack real-time collaboration and messaging platform built with React, No
 - Node.js (v16 or higher)
 - Docker and Docker Compose
 - npm or yarn
+- Git
 
-### Installation
+### Quick Start (Recommended)
+
+**Option 1: Automated Setup (Easiest)**
+
+1. **Clone and run setup script**
+   ```bash
+   git clone https://github.com/Snomn123/Nexus.git
+   cd Nexus
+   
+   # On Linux/Mac
+   chmod +x setup.sh && ./setup.sh
+   
+   # On Windows
+   setup.bat
+   ```
+
+2. **Start the applications**
+   ```bash
+   # Terminal 1: Start backend
+   cd backend
+   npm run dev
+   
+   # Terminal 2: Start frontend  
+   cd frontend
+   npm install && npm start
+   ```
+
+**Option 2: Manual Setup**
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd nexus
+   git clone https://github.com/Snomn123/Nexus.git
+   cd Nexus
    ```
 
-2. **Start the databases with Docker**
+2. **Set up environment files**
    ```bash
-   docker-compose up -d
+   # Copy environment files
+   cp .env.docker.example .env.docker
+   cp backend/.env.example backend/.env
+   cp frontend/.env.example frontend/.env
+   ```
+
+3. **Start the databases**
+   ```bash
+   # Start databases with Docker
+   docker-compose up -d postgres redis
+   ```
+
+4. **Set up and run the applications**
+   ```bash
+   # Install backend dependencies and run migrations
+   cd backend
+   npm install
+   npm run migrate
+   npm run dev
+
+   # In a new terminal, install frontend dependencies
+   cd frontend
+   npm install
+   npm start
+   ```
+
+### Manual Installation (Alternative)
+
+If you prefer to set up each component manually:
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Snomn123/Nexus.git
+   cd Nexus
+   ```
+
+2. **Start only the databases with Docker**
+   ```bash
+   docker-compose up -d postgres redis
    ```
 
 3. **Set up the backend**
    ```bash
    cd backend
    cp .env.example .env
+   # Edit .env file with your database credentials if needed
    npm install
    ```
 
@@ -67,6 +134,7 @@ A full-stack real-time collaboration and messaging platform built with React, No
    ```bash
    cd ../frontend
    cp .env.example .env
+   # Edit .env file with your API URLs if needed
    npm install
    ```
 
@@ -99,11 +167,45 @@ REACT_APP_SOCKET_URL=http://localhost:5000
 
 ### Database Setup
 
-The database schema will be automatically applied when you start the PostgreSQL container. You can also manually apply it:
+The project includes a complete database schema that's ready to use:
+
+**Automatic Setup (Recommended)**
+The database schema will be automatically applied when you start the PostgreSQL container with Docker.
+
+**Manual Database Setup**
+If you need to manually set up the database or reset it:
 
 ```bash
+# If using Docker (recommended)
 docker exec -i nexus_postgres psql -U postgres -d nexus < backend/schema.sql
+
+# If using a local PostgreSQL installation
+psql -U postgres -d nexus -f backend/schema.sql
 ```
+
+**Migration System**
+The project includes a built-in migration system for schema updates:
+
+```bash
+cd backend
+
+# Check migration status
+npm run migrate:status
+
+# Run pending migrations (if any)
+npm run migrate
+
+# Create a new migration (for development)
+npm run migrate:create "description of changes"
+```
+
+**Database Schema Includes:**
+- Users and authentication
+- Servers and channels
+- Messages and direct messages
+- Friends and friend requests
+- Proper indexes for performance
+- All necessary constraints and triggers
 
 ### Running the Application
 
@@ -238,6 +340,62 @@ nexus/
 - **Connection pooling** for PostgreSQL
 - **Message pagination** to reduce data transfer
 - **Optimized SQL queries** with proper joins
+
+## Troubleshooting
+
+### Common Issues
+
+**Database connection issues:**
+- Make sure Docker is running and containers are up: `docker-compose ps`
+- Check database logs: `docker-compose logs postgres`
+- Verify environment variables in `.env` files
+
+**Frontend not loading:**
+- Ensure `frontend/public/index.html` exists (it should be included in the repository)
+- Check that the React dev server is running on port 3000
+- Verify API URL in `frontend/.env` matches your backend
+
+**Backend API errors:**
+- Check that migrations ran successfully: `cd backend && npm run migrate:status`
+- Verify database connection in backend logs
+- Ensure all npm dependencies are installed
+
+**Port conflicts:**
+- Frontend runs on port 3000
+- Backend runs on port 5000  
+- PostgreSQL runs on port 5432
+- Redis runs on port 6379
+- Make sure these ports are available
+
+### Project Validation
+
+To verify the project is set up correctly after cloning:
+
+```bash
+# On Linux/Mac
+chmod +x validate.sh && ./validate.sh
+
+# On Windows (PowerShell)
+# Check key files exist
+Get-ChildItem backend\schema.sql, README.md, docker-compose.yml, frontend\public\index.html
+```
+
+### Fresh Install Reset
+
+If you need to completely reset the project:
+
+```bash
+# Stop all containers
+docker-compose down -v
+
+# Remove node_modules (optional)
+rm -rf backend/node_modules frontend/node_modules
+
+# Start fresh
+docker-compose up -d
+cd backend && npm install && npm run migrate
+cd ../frontend && npm install && npm start
+```
 
 ## Contributing
 
