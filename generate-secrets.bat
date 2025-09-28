@@ -6,7 +6,7 @@ echo 🔒 Nexus Production Security Setup
 echo ==================================
 
 echo.
-echo 📋 1. Generate JWT Secrets (copy these to your .env file):
+echo 1. Generate JWT Secrets (copy these to your .env file):
 node -e "console.log('JWT_SECRET=' + require('crypto').randomBytes(64).toString('hex'))"
 node -e "console.log('JWT_REFRESH_SECRET=' + require('crypto').randomBytes(64).toString('hex'))"
 
@@ -19,7 +19,7 @@ echo 📋 3. Generate Redis Password:
 node -e "console.log('REDIS_PASSWORD=' + require('crypto').randomBytes(32).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 20))"
 
 echo.
-echo ✅ Security Checklist for Production:
+echo Security Checklist for Production:
 echo □ Replace all default passwords and secrets
 echo □ Set NODE_ENV=production
 echo □ Enable HTTPS/SSL certificates
@@ -33,8 +33,8 @@ echo □ Run security audit: npm audit
 echo □ Set up monitoring and alerting
 
 echo.
-echo 🚨 CRITICAL: Never commit .env files to version control!
-echo 🚨 CRITICAL: Use different secrets for each environment!
+echo CRITICAL: Never commit .env files to version control!
+echo CRITICAL: Use different secrets for each environment!
 echo.
 
 pause

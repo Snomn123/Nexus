@@ -4,36 +4,36 @@ A full-stack real-time collaboration and messaging platform built with React, No
 
 ## Features
 
-- **Real-time messaging** and collaboration with Socket.IO
-- **User authentication** with JWT and HTTP-only cookies
-- **Workspace and channel management** 
-- **User presence** and online status
-- **Direct messaging** and group conversations
-- **Message replies** and editing
-- **Typing indicators** for enhanced user experience
-- **Secure password hashing** with bcrypt
-- **Redis caching** for optimal performance
-- **PostgreSQL database** with proper relationships
-- **Modern responsive UI** with TailwindCSS and Nexus design system
-- **TypeScript** for type safety and better development experience
+- Real-time messaging and collaboration with Socket.IO
+- User authentication with JWT and HTTP-only cookies
+- Workspace and channel management 
+- User presence and online status
+- Direct messaging and group conversations
+- Message replies and editing
+- Typing indicators for enhanced user experience
+- Secure password hashing with bcrypt
+- Redis caching for optimal performance
+- PostgreSQL database with proper relationships
+- Modern responsive UI with TailwindCSS and Nexus design system
+- TypeScript for type safety and better development experience
 
 ## Tech Stack
 
 ### Backend
-- **Node.js** with Express
-- **Socket.IO** for real-time communication
-- **PostgreSQL** for data persistence
-- **Redis** for caching and session management
-- **JWT** for authentication
-- **bcrypt** for password hashing
-- **Express Rate Limiting** for security
+- Node.js with Express
+- Socket.IO for real-time communication
+- PostgreSQL for data persistence
+- Redis for caching and session management
+- JWT for authentication
+- bcrypt for password hashing
+- Express Rate Limiting for security
 
 ### Frontend  
-- **React** with TypeScript
-- **TailwindCSS** for styling
-- **Axios** for API calls
-- **Socket.IO Client** for real-time features
-- **React Router** for navigation
+- React with TypeScript
+- TailwindCSS for styling
+- Axios for API calls
+- Socket.IO Client for real-time features
+- React Router for navigation
 
 ## Getting Started
 
@@ -46,9 +46,9 @@ A full-stack real-time collaboration and messaging platform built with React, No
 
 ### Quick Start (Recommended)
 
-**Option 1: Automated Setup (Easiest)**
+Option 1: Automated Setup (Easiest)
 
-1. **Clone and run setup script**
+1. Clone and run setup script
    ```bash
    git clone https://github.com/Snomn123/Nexus.git
    cd Nexus
@@ -60,7 +60,7 @@ A full-stack real-time collaboration and messaging platform built with React, No
    setup.bat
    ```
 
-2. **Start the applications**
+2. Start the applications
    ```bash
    # Terminal 1: Start backend
    cd backend
@@ -71,15 +71,15 @@ A full-stack real-time collaboration and messaging platform built with React, No
    npm install && npm start
    ```
 
-**Option 2: Manual Setup**
+Option 2: Manual Setup
 
-1. **Clone the repository**
+1. Clone the repository
    ```bash
    git clone https://github.com/Snomn123/Nexus.git
    cd Nexus
    ```
 
-2. **Set up environment files**
+2. Set up environment files
    ```bash
    # Copy environment files
    cp .env.docker.example .env.docker
@@ -87,13 +87,13 @@ A full-stack real-time collaboration and messaging platform built with React, No
    cp frontend/.env.example frontend/.env
    ```
 
-3. **Start the databases**
+3. Start the databases
    ```bash
    # Start databases with Docker
    docker-compose up -d postgres redis
    ```
 
-4. **Set up and run the applications**
+4. Set up and run the applications
    ```bash
    # Install backend dependencies and run migrations
    cd backend
@@ -111,18 +111,18 @@ A full-stack real-time collaboration and messaging platform built with React, No
 
 If you prefer to set up each component manually:
 
-1. **Clone the repository**
+1. Clone the repository
    ```bash
    git clone https://github.com/Snomn123/Nexus.git
    cd Nexus
    ```
 
-2. **Start only the databases with Docker**
+2. Start only the databases with Docker
    ```bash
    docker-compose up -d postgres redis
    ```
 
-3. **Set up the backend**
+3. Set up the backend
    ```bash
    cd backend
    cp .env.example .env
@@ -130,7 +130,7 @@ If you prefer to set up each component manually:
    npm install
    ```
 
-4. **Set up the frontend**
+4. Set up the frontend
    ```bash
    cd ../frontend
    cp .env.example .env
@@ -169,10 +169,10 @@ REACT_APP_SOCKET_URL=http://localhost:5000
 
 The project includes a complete database schema that's ready to use:
 
-**Automatic Setup (Recommended)**
+Automatic Setup (Recommended)
 The database schema will be automatically applied when you start the PostgreSQL container with Docker.
 
-**Manual Database Setup**
+Manual Database Setup
 If you need to manually set up the database or reset it:
 
 ```bash
@@ -183,7 +183,7 @@ docker exec -i nexus_postgres psql -U postgres -d nexus < backend/schema.sql
 psql -U postgres -d nexus -f backend/schema.sql
 ```
 
-**Migration System**
+Migration System
 The project includes a built-in migration system for schema updates:
 
 ```bash
@@ -199,7 +199,7 @@ npm run migrate
 npm run migrate:create "description of changes"
 ```
 
-**Database Schema Includes:**
+Database Schema Includes:
 - Users and authentication
 - Servers and channels
 - Messages and direct messages
@@ -209,19 +209,19 @@ npm run migrate:create "description of changes"
 
 ### Running the Application
 
-1. **Start the backend server**
+1. Start the backend server
    ```bash
    cd backend
    npm run dev
    ```
 
-2. **Start the frontend development server**
+2. Start the frontend development server
    ```bash
    cd frontend
    npm start
    ```
 
-3. **Access the application**
+3. Access the application
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:5000/api
    - Database Admin (Adminer): http://localhost:8080
@@ -267,14 +267,14 @@ npm run migrate:create "description of changes"
 ## Database Schema
 
 ### Tables
-- **users** - User accounts and profiles
-- **servers** - Nexus workspaces/servers
-- **server_members** - Many-to-many relationship between users and servers
-- **channels** - Text and voice channels within servers
-- **messages** - Chat messages with reply support
-- **message_attachments** - File attachments for messages
-- **direct_messages** - Private messages between users
-- **friends** - Friend relationships between users
+- users - User accounts and profiles
+- servers - Nexus workspaces/servers
+- server_members - Many-to-many relationship between users and servers
+- channels - Text and voice channels within servers
+- messages - Chat messages with reply support
+- message_attachments - File attachments for messages
+- direct_messages - Private messages between users
+- friends - Friend relationships between users
 
 ## Development Scripts
 

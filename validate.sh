@@ -3,7 +3,7 @@
 # Nexus Project Validation Script
 # Checks if the project is properly set up for git clone and build
 
-echo "🔍 Validating Nexus project setup..."
+echo "Validating Nexus project setup..."
 
 # Check required files
 echo "📁 Checking required files..."
@@ -30,7 +30,7 @@ for file in "${required_files[@]}"; do
 done
 
 if [[ ${#missing_files[@]} -eq 0 ]]; then
-    echo "✅ All required files present"
+    echo "All required files present"
 else
     echo "❌ Missing files:"
     for file in "${missing_files[@]}"; do
@@ -42,7 +42,7 @@ fi
 echo "🗃️  Checking migrations..."
 if [[ -d "backend/src/migrations" ]]; then
     migration_count=$(find backend/src/migrations -name "*.sql" | wc -l)
-    echo "✅ Found $migration_count migration files"
+    echo "Found $migration_count migration files"
 else
     echo "❌ Migrations directory not found"
 fi
@@ -60,9 +60,9 @@ if [[ -f "backend/schema.sql" ]]; then
     done
     
     if [[ ${#missing_tables[@]} -eq 0 ]]; then
-        echo "✅ All required database tables present in schema"
+        echo "All required database tables present in schema"
     else
-        echo "⚠️  Missing database tables in schema:"
+        echo "Missing database tables in schema:"
         for table in "${missing_tables[@]}"; do
             echo "   - $table"
         done
@@ -77,18 +77,18 @@ echo "📦 Checking package.json scripts..."
 # Backend scripts
 if [[ -f "backend/package.json" ]]; then
     if grep -q '"migrate"' backend/package.json; then
-        echo "✅ Backend migration scripts present"
+        echo "Backend migration scripts present"
     else
-        echo "⚠️  Backend migration scripts missing"
+        echo "Backend migration scripts missing"
     fi
 fi
 
 # Frontend scripts  
 if [[ -f "frontend/package.json" ]]; then
     if grep -q '"start"' frontend/package.json && grep -q '"build"' frontend/package.json; then
-        echo "✅ Frontend build scripts present"
+        echo "Frontend build scripts present"
     else
-        echo "⚠️  Frontend build scripts missing"
+        echo "Frontend build scripts missing"
     fi
 fi
 

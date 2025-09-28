@@ -2,14 +2,14 @@
 REM Nexus Production Deployment Script for Windows
 REM This script sets up and deploys Nexus in production mode
 
-echo 🚀 Nexus Production Deployment
+echo Nexus Production Deployment
 echo ==============================
 
 REM Check if .env.production exists
 if not exist ".env.production" (
     echo ❌ Error: .env.production file not found!
-    echo 📋 Please create .env.production with your production secrets.
-    echo 💡 Run 'npm run generate-secrets' to generate secure secrets.
+    echo Please create .env.production with your production secrets.
+    echo Run 'npm run generate-secrets' to generate secure secrets.
     pause
     exit /b 1
 )
@@ -57,37 +57,37 @@ echo ⏳ Waiting for services to start...
 timeout /t 30 /nobreak >nul
 
 REM Test application endpoints
-echo 🔍 Testing application endpoints...
+echo Testing application endpoints...
 
 REM Test health endpoint
 curl -f -s http://localhost/health >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Application health check failed
-    echo 📋 Checking logs...
+    echo Application health check failed
+    echo Checking logs...
     docker-compose -f docker-compose.prod.yml logs nginx
     pause
     exit /b 1
 ) else (
-    echo ✅ Application health check passed
+    echo Application health check passed
 )
 
 REM Test API health endpoint
 curl -f -s http://localhost/api/health >nul 2>&1
 if errorlevel 1 (
-    echo ❌ API health check failed
-    echo 📋 Checking logs...
+    echo API health check failed
+    echo Checking logs...
     docker-compose -f docker-compose.prod.yml logs backend
     pause
     exit /b 1
 ) else (
-    echo ✅ API health check passed
+    echo API health check passed
 )
 
 REM Display deployment information
 echo.
-echo 🎉 DEPLOYMENT SUCCESSFUL!
+echo DEPLOYMENT SUCCESSFUL!
 echo ========================
-echo 📱 Application URL: http://localhost
+echo Application URL: http://localhost
 echo 🔧 API URL: http://localhost/api
 echo 🏥 Health Check: http://localhost/health
 echo.
@@ -95,7 +95,7 @@ echo 📊 Container Status:
 docker-compose -f docker-compose.prod.yml ps
 
 echo.
-echo 📋 Next Steps:
+echo Next Steps:
 echo 1. 🌐 Set up your domain and SSL certificates
 echo 2. 🔒 Update FRONTEND_URL in .env.production
 echo 3. 📊 Set up monitoring and logging
@@ -110,7 +110,7 @@ echo - Restart services: docker-compose -f docker-compose.prod.yml restart
 echo - Update: git pull ^&^& docker-compose -f docker-compose.prod.yml up -d --build
 
 echo.
-echo 🎯 Your Nexus application is now running in production mode!
+echo Your Nexus application is now running in production mode!
 echo.
 
 pause
