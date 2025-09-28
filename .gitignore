@@ -25,8 +25,25 @@ dist/
 # Environment files with secrets
 .env.docker
 .env
+.env.production
+.env.staging
 backend/.env
+backend/.env.production
+backend/.env.staging
 frontend/.env
+frontend/.env.production
+frontend/.env.staging
+
+# Production data directories
+data/
+nginx/ssl/
+uploads/
+logs/
+
+# Backup files
+backup_*.sql
+*.backup
+*.tar.gz
 
 # Logs
 logs
