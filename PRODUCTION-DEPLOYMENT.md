@@ -1,10 +1,10 @@
-# 🚀 PRODUCTION DEPLOYMENT GUIDE
+# Production Deployment Guide
 
-## 📋 Pre-Deployment Checklist
+## Pre-Deployment Setup
 
-### 1. **Generate Production Secrets**
+### Generate Production Secrets
 ```bash
-# Run this to generate secure secrets
+# Generate secure secrets
 node -e "console.log('JWT_SECRET=' + require('crypto').randomBytes(64).toString('hex'))"
 node -e "console.log('JWT_REFRESH_SECRET=' + require('crypto').randomBytes(64).toString('hex'))"
 node -e "console.log('DB_PASSWORD=' + require('crypto').randomBytes(32).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 20))"
@@ -30,9 +30,9 @@ Update these values in `.env.production`:
 - `DB_PASSWORD=` (your generated password)
 - `REDIS_PASSWORD=` (your generated password)
 
-## 🐳 Docker Production Deployment
+## Docker Production Deployment
 
-### **Option 1: Quick Local Production Test**
+### Local Production Test
 ```bash
 # Build and start production containers
 docker-compose -f docker-compose.prod.yml up --build
@@ -40,7 +40,7 @@ docker-compose -f docker-compose.prod.yml up --build
 # Access at: http://localhost
 ```
 
-### **Option 2: Server Deployment with SSL**
+### Server Deployment with SSL
 ```bash
 # 1. Set up SSL certificates (Let's Encrypt recommended)
 mkdir -p nginx/ssl

@@ -1,13 +1,13 @@
-# DM Navigation Fix Test
+# DM Navigation Fix
 
 ## Changes Made
 
-1. **DMList Component (DMList.tsx)**:
-   - Added optional `onSwitchToDMs` prop
-   - Modified `handleConversationSelect` to call `onSwitchToDMs()` when clicking a conversation from the sidebar
-   - Added logging to track when view switching occurs
+### DMList Component
+- Added optional `onSwitchToDMs` prop
+- Modified `handleConversationSelect` to call `onSwitchToDMs()` when clicking a conversation from the sidebar
+- Added logging to track when view switching occurs
 
-2. **App Component (App.tsx)**:
+2. App Component (App.tsx):
    - Updated DMs view layout to show both DMList sidebar and DMChat side by side
    - Added proper styling with nexus-glass and border classes
    - Passed `handleShowDMs` callback to DMList when rendered in Friends sidebar
@@ -37,14 +37,14 @@
 
 ## Test Steps
 
-1. **Start the app**: `npm run dev`
-2. **Login** with a test account
-3. **Go to Friends view** (click Friends in sidebar)
-4. **Verify DM conversations** are visible in the sidebar under "Direct Messages"
-5. **Click on a DM conversation** from the Friends sidebar
-6. **Verify view switches** to DMs view automatically
-7. **Verify the conversation opens** in the main chat area
-8. **Test clicking other conversations** in the DM sidebar to ensure they switch properly
+1. Start the app: `npm run dev`
+2. Login with a test account
+3. Go to Friends view (click Friends in sidebar)
+4. Verify DM conversations are visible in the sidebar under "Direct Messages"
+5. Click on a DM conversation from the Friends sidebar
+6. Verify view switches to DMs view automatically
+7. Verify the conversation opens in the main chat area
+8. Test clicking other conversations in the DM sidebar to ensure they switch properly
 
 ## Technical Details
 
