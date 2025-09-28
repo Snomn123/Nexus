@@ -283,15 +283,42 @@ const dmController = {
 
       const participant = participantResult.rows[0];
 
+      // Check for existing messages to get proper conversation state
+      const lastMessageQuery = `
+        SELECT content, sender_id, created_at
+        FROM direct_messages
+        WHERE conversation_id = $1
+        ORDER BY created_at DESC
+        LIMIT 1
+      `;
+      const lastMessageResult = await db.query(lastMessageQuery, [conversationId]);
+      
+      // Get unread count
+      const unreadQuery = `
+        SELECT COUNT(*) as count
+        FROM direct_messages
+        WHERE conversation_id = $1 AND receiver_id = $2 AND read = false
+      `;
+      const unreadResult = await db.query(unreadQuery, [conversationId, userId]);
+      
+      const lastMessage = lastMessageResult.rows[0];
+      const unreadCount = parseInt(unreadResult.rows[0].count);
+
       const conversation = {
         id: conversationId,
         participant_id: participant_id,
         participant_username: participant.username,
         participant_avatar_url: participant.avatar_url,
         participant_status: participant.status,
-        last_message: null,
-        unread_count: 0,
-        updated_at: new Date().toISOString()
+        last_message: lastMessage ? {
+          id: null,
+          content: lastMessage.content,
+          sender_id: lastMessage.sender_id,
+          sender_username: lastMessage.sender_id === userId ? 'You' : participant.username,
+          created_at: lastMessage.created_at
+        } : null,
+        unread_count: unreadCount,
+        updated_at: lastMessage ? lastMessage.created_at : new Date().toISOString()
       };
 
       res.json({

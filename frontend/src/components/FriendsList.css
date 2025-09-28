@@ -194,6 +194,7 @@
   box-shadow: 0 2px 6px rgba(59, 165, 92, 0.3);
 }
 
+/* Also used for cancel buttons */
 .decline-btn:hover,
 .remove-btn:hover {
   background-color: #f04747;
@@ -235,9 +236,9 @@
   background: rgba(55, 65, 81, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #dcddde;
-  padding: 12px 16px;
+  padding: 10px 16px;
   border-radius: 8px;
-  font-size: 16px;
+  font-size: 15px;
   outline: none;
   transition: all 0.15s ease;
 }
@@ -255,13 +256,17 @@
   background: linear-gradient(135deg, #6366f1, #4f46e5);
   border: none;
   color: white;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
   box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .send-request-btn:hover:not(:disabled) {
@@ -329,6 +334,8 @@
   
   .send-request-btn {
     margin-top: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
   }
   
   .friend-item,

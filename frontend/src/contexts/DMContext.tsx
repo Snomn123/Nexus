@@ -171,6 +171,18 @@ export const DMProvider: React.FC<DMProviderProps> = ({ children, onSwitchToDMs 
   const startDirectConversation = async (userId: number): Promise<DMConversation> => {
     try {
       setError('');
+      
+      // First, check if conversation already exists in our list
+      const existingConversation = conversations.find(conv => conv.participant_id === userId);
+      if (existingConversation) {
+        // Set as active conversation and switch view
+        setActiveConversationState(existingConversation);
+        if (onSwitchToDMs) {
+          onSwitchToDMs();
+        }
+        return existingConversation;
+      }
+      
       const response = await api.post<ApiResponse<DMConversation>>('/dm/conversations', {
         participant_id: userId
       });
@@ -182,7 +194,10 @@ export const DMProvider: React.FC<DMProviderProps> = ({ children, onSwitchToDMs 
         setConversations(prev => {
           const existing = prev.find(conv => conv.id === newConversation.id);
           if (existing) {
-            return prev;
+            // Update existing conversation with fresh data
+            return prev.map(conv => 
+              conv.id === newConversation.id ? newConversation : conv
+            );
           }
           return [newConversation, ...prev];
         });
@@ -244,6 +259,10 @@ export const DMProvider: React.FC<DMProviderProps> = ({ children, onSwitchToDMs 
     (window as any).dmForceRefresh = refreshConversations;
   }
 
+  const hideConversation = (conversationId: string) => {
+    setConversations(prev => prev.filter(conv => conv.id !== conversationId));
+  };
+
   const value: DMContextType = {
     conversations,
     activeConversation,
@@ -256,6 +275,7 @@ export const DMProvider: React.FC<DMProviderProps> = ({ children, onSwitchToDMs 
     refreshConversations,
     refreshMessages,
     startDirectConversation,
+    hideConversation,
   };
 
   return (

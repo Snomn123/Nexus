@@ -205,8 +205,9 @@ export interface FriendsContextType {
   loading: boolean;
   error: string;
   sendFriendRequest: (username: string) => Promise<void>;
-  acceptFriendRequest: (requestId: number) => Promise<void>;
+  acceptFriendRequest: (requestId: number) => Promise<{ id: number; username: string; avatar_url?: string } | undefined>;
   declineFriendRequest: (requestId: number) => Promise<void>;
+  cancelFriendRequest: (requestId: number) => Promise<void>;
   removeFriend: (friendId: number) => Promise<void>;
   refreshFriends: () => Promise<void>;
   refreshFriendRequests: () => Promise<void>;
@@ -224,6 +225,7 @@ export interface DMContextType {
   refreshConversations: () => Promise<void>;
   refreshMessages: (conversationId: string) => Promise<void>;
   startDirectConversation: (userId: number) => Promise<DMConversation>;
+  hideConversation: (conversationId: string) => void;
 }
 
 // Component prop types

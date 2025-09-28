@@ -221,13 +221,18 @@ export const friendsAPI = {
     return response.data;
   },
 
-  acceptFriendRequest: async (requestId: number): Promise<{ message: string }> => {
+  acceptFriendRequest: async (requestId: number): Promise<{ message: string; data?: { friend: { id: number; username: string; avatar_url?: string } } }> => {
     const response = await api.post(`/friends/requests/${requestId}/accept`);
     return response.data;
   },
 
   declineFriendRequest: async (requestId: number): Promise<{ message: string }> => {
     const response = await api.post(`/friends/requests/${requestId}/decline`);
+    return response.data;
+  },
+
+  cancelFriendRequest: async (requestId: number): Promise<{ message: string }> => {
+    const response = await api.delete(`/friends/requests/${requestId}`);
     return response.data;
   },
 

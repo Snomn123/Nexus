@@ -195,9 +195,12 @@ const friendsController = {
 
         await db.query('COMMIT');
 
-        // Get receiver info for notification
+        // Get sender and receiver info
         const receiverInfoQuery = 'SELECT username, avatar_url FROM users WHERE id = $1';
         const receiverInfo = await db.query(receiverInfoQuery, [receiver_id]);
+        
+        const senderInfoQuery = 'SELECT username, avatar_url FROM users WHERE id = $1';
+        const senderInfo = await db.query(senderInfoQuery, [sender_id]);
 
         // Send socket notification to sender that request was accepted
         const socketHandler = req.app.get('socketHandler');
@@ -209,7 +212,17 @@ const friendsController = {
           });
         }
 
-        res.json({ message: 'Friend request accepted successfully' });
+        // Return friend info for starting DM conversation
+        const friendInfo = senderInfo.rows.length > 0 ? {
+          id: sender_id,
+          username: senderInfo.rows[0].username,
+          avatar_url: senderInfo.rows[0].avatar_url
+        } : null;
+
+        res.json({ 
+          message: 'Friend request accepted successfully',
+          data: { friend: friendInfo }
+        });
       } catch (error) {
         await db.query('ROLLBACK');
         throw error;
@@ -242,6 +255,31 @@ const friendsController = {
       res.json({ message: 'Friend request declined successfully' });
     } catch (error) {
       console.error('Error declining friend request:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+
+  // Cancel friend request
+  cancelFriendRequest: async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const requestId = parseInt(req.params.requestId);
+
+      // Delete request only if user is the sender
+      const query = `
+        DELETE FROM friend_requests 
+        WHERE id = $1 AND sender_id = $2 AND status = 'pending'
+        RETURNING id
+      `;
+      const result = await db.query(query, [requestId, userId]);
+      
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'Friend request not found or you cannot cancel this request' });
+      }
+
+      res.json({ message: 'Friend request cancelled successfully' });
+    } catch (error) {
+      console.error('Error cancelling friend request:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
   },

@@ -85,11 +85,14 @@ export const FriendsProvider: React.FC<FriendsProviderProps> = ({ children }) =>
   const acceptFriendRequest = async (requestId: number) => {
     try {
       setError('');
-      await friendsAPI.acceptFriendRequest(requestId);
+      const response = await friendsAPI.acceptFriendRequest(requestId);
       
       // Refresh both friends and requests
       await refreshFriends();
       await refreshFriendRequests();
+      
+      // Return friend info for starting DM
+      return response.data?.friend;
     } catch (err: any) {
       console.error('Error accepting friend request:', err);
       setError(err.response?.data?.message || 'Failed to accept friend request');
@@ -107,6 +110,20 @@ export const FriendsProvider: React.FC<FriendsProviderProps> = ({ children }) =>
     } catch (err: any) {
       console.error('Error declining friend request:', err);
       setError(err.response?.data?.message || 'Failed to decline friend request');
+      throw err;
+    }
+  };
+
+  const cancelFriendRequest = async (requestId: number) => {
+    try {
+      setError('');
+      await friendsAPI.cancelFriendRequest(requestId);
+      
+      // Refresh requests
+      await refreshFriendRequests();
+    } catch (err: any) {
+      console.error('Error cancelling friend request:', err);
+      setError(err.response?.data?.message || 'Failed to cancel friend request');
       throw err;
     }
   };
@@ -134,6 +151,7 @@ export const FriendsProvider: React.FC<FriendsProviderProps> = ({ children }) =>
     sendFriendRequest,
     acceptFriendRequest,
     declineFriendRequest,
+    cancelFriendRequest,
     removeFriend,
     refreshFriends,
     refreshFriendRequests,

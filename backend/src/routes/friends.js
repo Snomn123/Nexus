@@ -21,6 +21,9 @@ router.post('/requests/:requestId/accept', friendsController.acceptFriendRequest
 // Decline friend request
 router.post('/requests/:requestId/decline', friendsController.declineFriendRequest);
 
+// Cancel friend request
+router.delete('/requests/:requestId', friendsController.cancelFriendRequest);
+
 // Remove friend
 router.delete('/:friendId', friendsController.removeFriend);
 

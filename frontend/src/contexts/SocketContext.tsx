@@ -23,17 +23,9 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   useEffect(() => {
     if (user && !socketRef.current && !connectionAttemptRef.current) {
       connectionAttemptRef.current = true;
-      console.log('🔌 Initializing Socket.IO connection for user:', user.username);
-      console.log('🌐 Socket URL:', process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000');
-      console.log('🔧 Environment variables:', {
-        REACT_APP_SOCKET_URL: process.env.REACT_APP_SOCKET_URL,
-        NODE_ENV: process.env.NODE_ENV,
-        window_location: window.location.href
-      });
       
       // Create socket connection using cookies for auth
       const socketUrl = process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
-      console.log('🔗 Creating socket connection to:', socketUrl);
       
       const socketOptions = {
         withCredentials: true, // This will send cookies including JWT token

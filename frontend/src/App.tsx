@@ -418,7 +418,7 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
                 <div className="h-px bg-gray-600 opacity-40 mb-4"></div>
               </div>
               
-              <DMList />
+              <DMList onSwitchToDMs={handleShowDMs} />
             </div>
           )}
         </div>

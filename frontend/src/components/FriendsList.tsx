@@ -22,6 +22,7 @@ const FriendsList: React.FC = () => {
     sendFriendRequest,
     acceptFriendRequest,
     declineFriendRequest,
+    cancelFriendRequest,
     removeFriend
   } = useFriends();
 
@@ -81,7 +82,17 @@ const FriendsList: React.FC = () => {
 
   const handleAcceptRequest = async (requestId: number) => {
     try {
-      await acceptFriendRequest(requestId);
+      const friendInfo = await acceptFriendRequest(requestId);
+      
+      // Automatically start a DM conversation with the new friend
+      if (friendInfo?.id) {
+        try {
+          await startDirectConversation(friendInfo.id);
+        } catch (dmErr) {
+          console.error('Failed to start conversation with new friend:', dmErr);
+          // Don't throw here - the friend request was still accepted successfully
+        }
+      }
     } catch (err) {
       console.error('Failed to accept friend request:', err);
     }
@@ -92,6 +103,14 @@ const FriendsList: React.FC = () => {
       await declineFriendRequest(requestId);
     } catch (err) {
       console.error('Failed to decline friend request:', err);
+    }
+  };
+
+  const handleCancelRequest = async (requestId: number) => {
+    try {
+      await cancelFriendRequest(requestId);
+    } catch (err) {
+      console.error('Failed to cancel friend request:', err);
     }
   };
 
@@ -159,55 +178,85 @@ const FriendsList: React.FC = () => {
           onClick={() => handleStartDM(friend)}
           title="Send Message"
         >
-          💬
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
         </button>
         <button
           className="action-btn remove-btn"
           onClick={() => handleRemoveFriend(friend.id, friend.username)}
           title="Remove Friend"
         >
-          🗑️
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
         </button>
       </div>
     </div>
   );
 
-  const renderPendingRequest = (request: FriendRequest) => (
-    <div key={request.id} className="friend-request-item">
-      <div className="friend-avatar">
-        {request.sender_avatar_url ? (
-          <img src={request.sender_avatar_url} alt={request.sender_username} />
-        ) : (
-          <div 
-            className="avatar-placeholder"
-            style={{ backgroundColor: getAvatarColor(request.sender_username) }}
-          >
-            {request.sender_username.charAt(0).toUpperCase()}
+  const renderPendingRequest = (request: FriendRequest) => {
+    const isOutgoing = user && request.sender_id === user.id;
+    const displayUsername = isOutgoing ? request.receiver_username : request.sender_username;
+    const displayAvatar = isOutgoing ? request.receiver_avatar_url : request.sender_avatar_url;
+    
+    return (
+      <div key={request.id} className="friend-request-item">
+        <div className="friend-avatar">
+          {displayAvatar ? (
+            <img src={displayAvatar} alt={displayUsername} />
+          ) : (
+            <div 
+              className="avatar-placeholder"
+              style={{ backgroundColor: getAvatarColor(displayUsername) }}
+            >
+              {displayUsername.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+        <div className="friend-info">
+          <div className="friend-username">{displayUsername}</div>
+          <div className="request-text">
+            {isOutgoing ? 'Outgoing Friend Request' : 'Incoming Friend Request'}
           </div>
-        )}
+        </div>
+        <div className="friend-actions">
+          {isOutgoing ? (
+            <button
+              className="action-btn decline-btn"
+              onClick={() => handleCancelRequest(request.id)}
+              title="Cancel Request"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          ) : (
+            <>
+              <button
+                className="action-btn accept-btn"
+                onClick={() => handleAcceptRequest(request.id)}
+                title="Accept"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </button>
+              <button
+                className="action-btn decline-btn"
+                onClick={() => handleDeclineRequest(request.id)}
+                title="Decline"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      <div className="friend-info">
-        <div className="friend-username">{request.sender_username}</div>
-        <div className="request-text">Incoming Friend Request</div>
-      </div>
-      <div className="friend-actions">
-        <button
-          className="action-btn accept-btn"
-          onClick={() => handleAcceptRequest(request.id)}
-          title="Accept"
-        >
-          ✅
-        </button>
-        <button
-          className="action-btn decline-btn"
-          onClick={() => handleDeclineRequest(request.id)}
-          title="Decline"
-        >
-          ❌
-        </button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderAddFriend = () => (
     <div className="add-friend-section">
@@ -224,7 +273,10 @@ const FriendsList: React.FC = () => {
             className="add-friend-input"
           />
           <button type="submit" className="send-request-btn" disabled={loading}>
-            Send Friend Request
+            <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Send Request
           </button>
         </div>
       </form>
@@ -235,7 +287,9 @@ const FriendsList: React.FC = () => {
           {addFriendError && (
             <div className="bg-red-500 bg-opacity-10 border border-red-500 rounded-lg p-3 mb-3">
               <div className="flex items-center text-red-400">
-                <span className="mr-2">⚠️</span>
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
                 <span className="text-sm">{addFriendError}</span>
               </div>
             </div>
@@ -243,7 +297,9 @@ const FriendsList: React.FC = () => {
           {addFriendSuccess && (
             <div className="bg-green-500 bg-opacity-10 border border-green-500 rounded-lg p-3 mb-3">
               <div className="flex items-center text-green-400">
-                <span className="mr-2">✅</span>
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
                 <span className="text-sm">{addFriendSuccess}</span>
               </div>
             </div>
@@ -251,7 +307,9 @@ const FriendsList: React.FC = () => {
           {error && (
             <div className="bg-red-500 bg-opacity-10 border border-red-500 rounded-lg p-3">
               <div className="flex items-center text-red-400">
-                <span className="mr-2">⚠️</span>
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
                 <span className="text-sm">{error}</span>
               </div>
             </div>

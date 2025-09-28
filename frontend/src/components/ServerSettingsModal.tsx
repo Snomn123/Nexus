@@ -120,7 +120,12 @@ const ServerSettingsModal: React.FC<ServerSettingsModalProps> = ({
                   ) : (
                     <div className="space-y-3">
                       <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg">
-                        <p className="text-red-200 text-sm font-medium mb-2">⚠️ Confirm Server Deletion</p>
+                        <p className="text-red-200 text-sm font-medium mb-2 flex items-center">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                          </svg>
+                          Confirm Server Deletion
+                        </p>
                         <p className="text-red-300 text-xs">
                           This will permanently delete "{server.name}" and all its content. This cannot be undone.
                         </p>
@@ -162,7 +167,12 @@ const ServerSettingsModal: React.FC<ServerSettingsModalProps> = ({
                   ) : (
                     <div className="space-y-3">
                       <div className="p-3 bg-yellow-500/20 border border-yellow-500/30 rounded-lg">
-                        <p className="text-yellow-200 text-sm font-medium mb-2">⚠️ Confirm Leave Server</p>
+                        <p className="text-yellow-200 text-sm font-medium mb-2 flex items-center">
+                          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                          </svg>
+                          Confirm Leave Server
+                        </p>
                         <p className="text-yellow-300 text-xs">
                           Are you sure you want to leave "{server.name}"? You'll need an invite to rejoin.
                         </p>
