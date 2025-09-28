@@ -1,39 +1,59 @@
-# Nexus
+# Nexus - Real-Time Discord Clone
 
-A full-stack real-time collaboration and messaging platform built with React, Node.js, PostgreSQL, Redis, and Socket.IO.
+<div align="center">
+  <h3>🚀 A modern, secure real-time communication platform</h3>
+  
+  [![Production Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)](https://github.com/Snomn123/Nexus)
+  [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org/)
+  [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+  [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://docker.com/)
+  [![E2EE](https://img.shields.io/badge/Security-End--to--End%20Encrypted-red?logo=shield)](https://github.com/Snomn123/Nexus)
 
-## Features
+  <p><em>Experience seamless communication with military-grade encryption, real-time messaging, and modern UI design.</em></p>
+</div>
 
-- Real-time messaging and collaboration with Socket.IO
-- User authentication with JWT and HTTP-only cookies
-- Workspace and channel management 
-- User presence and online status
-- Direct messaging and group conversations
-- Message replies and editing
-- Typing indicators for enhanced user experience
-- Secure password hashing with bcrypt
-- Redis caching for optimal performance
-- PostgreSQL database with proper relationships
-- Modern responsive UI with TailwindCSS and Nexus design system
-- TypeScript for type safety and better development experience
+---
 
-## Tech Stack
+## ✨ Features
 
-### Backend
-- Node.js with Express
-- Socket.IO for real-time communication
-- PostgreSQL for data persistence
-- Redis for caching and session management
-- JWT for authentication
-- bcrypt for password hashing
-- Express Rate Limiting for security
+### 🔐 **Security & Privacy**
+- **🛡️ End-to-End Encryption** - AES-256 encryption ensures your messages stay private
+- **🔑 Zero-Knowledge Architecture** - Server administrators cannot read your messages
+- **🚪 JWT Authentication** - Secure login with refresh token rotation
+- **🔒 HTTPS/WSS** - All traffic encrypted in transit
 
-### Frontend  
-- React with TypeScript
-- TailwindCSS for styling
-- Axios for API calls
-- Socket.IO Client for real-time features
-- React Router for navigation
+### 💬 **Communication**
+- **⚡ Real-Time Messaging** - Instant message delivery via WebSockets
+- **📱 Direct Messages** - Private conversations between friends
+- **🏟️ Server Channels** - Organized team communication
+- **↩️ Message Replies** - Thread-like conversation context
+- **✏️ Message Editing** - Edit and delete your messages
+- **👀 Typing Indicators** - See when others are typing
+
+### 👥 **Social Features**
+- **👫 Friend System** - Send and manage friend requests
+- **🟢 Online Presence** - Real-time user status indicators
+- **👤 User Profiles** - Customizable avatars and usernames
+- **🎨 Avatar System** - Colorful generated avatars
+
+### 🎨 **User Experience**
+- **📱 Responsive Design** - Works perfectly on desktop and mobile
+- **🌙 Modern UI** - Clean, Discord-inspired interface
+- **🔊 Sound Notifications** - Audio cues for new messages
+- **⌨️ Keyboard Shortcuts** - Power user productivity features
+- **📄 Message History** - Paginated message loading
+
+---
+
+## 🏗️ Architecture
+
+### **Tech Stack**
+- **Frontend**: React 18 + TypeScript + Tailwind CSS
+- **Backend**: Node.js + Express + Socket.io
+- **Database**: PostgreSQL with Redis caching
+- **Security**: AES-256 encryption + PBKDF2 key derivation
+- **Infrastructure**: Docker + Docker Compose
 
 ## Getting Started
 
