@@ -21,7 +21,7 @@ const getChannelMessages = async (req, res) => {
             return res.status(403).json({ error: 'Access denied' });
         }
 
-        // Get messages with user information
+        // Get messages with user information (including encryption fields)
         const messages = await db.query(`
             SELECT 
                 m.*,
@@ -99,13 +99,24 @@ const sendMessage = async (req, res) => {
             }
         }
 
-        // Create message
-        const newMessage = await db.query(
-            'INSERT INTO messages (content, user_id, channel_id, reply_to) VALUES ($1, $2, $3, $4) RETURNING *',
-            [content, userId, channelId, replyTo || null]
-        );
+        // Handle encryption fields
+        const { encrypted_content, is_encrypted, encryption_version } = req.body;
+        
+        // Create message with optional encryption fields
+        let query, values;
+        if (is_encrypted && encrypted_content) {
+            query = `INSERT INTO messages 
+                     (content, user_id, channel_id, reply_to, encrypted_content, is_encrypted, encryption_version) 
+                     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+            values = [content, userId, channelId, replyTo || null, encrypted_content, is_encrypted, encryption_version];
+        } else {
+            query = 'INSERT INTO messages (content, user_id, channel_id, reply_to) VALUES ($1, $2, $3, $4) RETURNING *';
+            values = [content, userId, channelId, replyTo || null];
+        }
+        
+        const newMessage = await db.query(query, values);
 
-        // Get message with user information
+        // Get message with user information (including encryption fields)
         const messageWithUser = await db.query(`
             SELECT 
                 m.*,
@@ -159,11 +170,22 @@ const editMessage = async (req, res) => {
             return res.status(403).json({ error: 'You can only edit your own messages' });
         }
 
-        // Update message
-        const updatedMessage = await db.query(
-            'UPDATE messages SET content = $1, edited = true WHERE id = $2 RETURNING *',
-            [content, messageId]
-        );
+        // Handle encryption fields for edit
+        const { encrypted_content, is_encrypted, encryption_version } = req.body;
+        
+        // Update message with optional encryption fields
+        let query, values;
+        if (is_encrypted && encrypted_content) {
+            query = `UPDATE messages 
+                     SET content = $1, edited = true, encrypted_content = $2, is_encrypted = $3, encryption_version = $4 
+                     WHERE id = $5 RETURNING *`;
+            values = [content, encrypted_content, is_encrypted, encryption_version, messageId];
+        } else {
+            query = 'UPDATE messages SET content = $1, edited = true WHERE id = $2 RETURNING *';
+            values = [content, messageId];
+        }
+        
+        const updatedMessage = await db.query(query, values);
 
         // Get updated message with user information
         const messageWithUser = await db.query(`

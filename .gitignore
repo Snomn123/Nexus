@@ -144,3 +144,13 @@ docker-compose.override.yml
 *.pem
 *.key
 *.crt
+
+# Unrelated to project files
+ENCRYPTION_USER_GUIDE.md
+END-TO-END-ENCRYPTION-GUIDE.md
+FINAL-PRODUCTION-CHECKLIST.md
+PRODUCTION-COMPLETE.md
+PRODUCTION-DEPLOYMENT.md
+test-dm-navigation.md
+WARP.md
+E2EE_IMPLEMENTATION_SUMMARY.md

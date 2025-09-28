@@ -126,7 +126,10 @@ const dmController = {
           dm.edited,
           dm.read,
           dm.created_at,
-          dm.updated_at
+          dm.updated_at,
+          dm.encrypted_content,
+          dm.is_encrypted,
+          dm.encryption_version
         FROM direct_messages dm
         JOIN users sender ON dm.sender_id = sender.id
         LEFT JOIN direct_messages reply_msg ON dm.reply_to = reply_msg.id
@@ -186,19 +189,27 @@ const dmController = {
         finalConversationId = `dm_${user1}_${user2}`;
       }
 
-      const query = `
-        INSERT INTO direct_messages (sender_id, receiver_id, content, conversation_id, reply_to)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING *
-      `;
+      // Handle encryption fields
+      const { encrypted_content, is_encrypted, encryption_version } = req.body;
       
-      const result = await db.query(query, [
-        senderId, 
-        receiver_id, 
-        content, 
-        finalConversationId, 
-        reply_to || null
-      ]);
+      let query, values;
+      if (is_encrypted && encrypted_content) {
+        query = `
+          INSERT INTO direct_messages (sender_id, receiver_id, content, conversation_id, reply_to, encrypted_content, is_encrypted, encryption_version)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          RETURNING *
+        `;
+        values = [senderId, receiver_id, content, finalConversationId, reply_to || null, encrypted_content, is_encrypted, encryption_version];
+      } else {
+        query = `
+          INSERT INTO direct_messages (sender_id, receiver_id, content, conversation_id, reply_to)
+          VALUES ($1, $2, $3, $4, $5)
+          RETURNING *
+        `;
+        values = [senderId, receiver_id, content, finalConversationId, reply_to || null];
+      }
+      
+      const result = await db.query(query, values);
 
       // Get sender info for the response
       const senderQuery = 'SELECT username, avatar_url FROM users WHERE id = $1';

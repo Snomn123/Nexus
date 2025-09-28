@@ -1,14 +1,18 @@
 import axios, { AxiosResponse } from 'axios';
+import encryptionService from './encryptionService';
 import {
   User,
   Server,
   Message,
+  DirectMessage,
+  DMConversation,
   ApiResponse,
   LoginRequest,
   RegisterRequest,
   CreateServerRequest,
   JoinServerRequest,
   SendMessageRequest,
+  EditMessageRequest,
 } from '../types';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -186,20 +190,172 @@ export const messageAPI = {
     channelId: number,
     messageData: SendMessageRequest
   ): Promise<ApiResponse<{ data: Message }>> => {
-    const response = await api.post(`/messages/channels/${channelId}`, messageData);
+    let processedData = { ...messageData };
+    
+    // Encrypt message content if encryption is enabled
+    if (encryptionService.isEncryptionReady()) {
+      const encrypted = encryptionService.encryptMessage(messageData.content, channelId);
+      processedData = {
+        ...messageData,
+        content: '[ENCRYPTED]', // Placeholder for server
+        encrypted_content: encrypted.encrypted_content,
+        is_encrypted: encrypted.is_encrypted,
+        encryption_version: String(encrypted.encryption_version)
+      };
+    }
+    
+    const response = await api.post(`/messages/channels/${channelId}`, processedData);
+    
+    // Decrypt the response if needed
+    if (encryptionService.isEncryptionReady() && response.data.data) {
+      response.data.data.content = encryptionService.decryptMessage({
+        content: response.data.data.content,
+        encrypted_content: response.data.data.encrypted_content,
+        is_encrypted: response.data.data.is_encrypted
+      }, channelId);
+    }
+    
     return response.data;
   },
 
   editMessage: async (
     messageId: number,
-    content: string
+    content: string,
+    channelId?: number
   ): Promise<ApiResponse<{ data: Message }>> => {
-    const response = await api.put(`/messages/${messageId}`, { content });
+    let processedData: EditMessageRequest = { content };
+    
+    // Encrypt edited content if encryption is enabled and channelId is provided
+    if (encryptionService.isEncryptionReady() && channelId) {
+      const encrypted = encryptionService.encryptMessage(content, channelId);
+      processedData = {
+        content: '[ENCRYPTED]',
+        encrypted_content: encrypted.encrypted_content,
+        is_encrypted: encrypted.is_encrypted,
+        encryption_version: String(encrypted.encryption_version)
+      };
+    }
+    
+    const response = await api.put(`/messages/${messageId}`, processedData);
+    
+    // Decrypt the response if needed
+    if (encryptionService.isEncryptionReady() && response.data.data && channelId) {
+      response.data.data.content = encryptionService.decryptMessage({
+        content: response.data.data.content,
+        encrypted_content: response.data.data.encrypted_content,
+        is_encrypted: response.data.data.is_encrypted
+      }, channelId);
+    }
+    
     return response.data;
   },
 
   deleteMessage: async (messageId: number): Promise<ApiResponse> => {
     const response = await api.delete(`/messages/${messageId}`);
+    return response.data;
+  },
+};
+
+// Direct Message API
+export const dmAPI = {
+  getConversations: async (): Promise<ApiResponse<{ conversations: DMConversation[] }>> => {
+    const response = await api.get('/dm/conversations');
+    return response.data;
+  },
+
+  getConversationMessages: async (
+    conversationId: string,
+    page = 1,
+    limit = 50
+  ): Promise<ApiResponse<{ data: DirectMessage[] }>> => {
+    const response = await api.get(`/dm/conversations/${conversationId}/messages`, {
+      params: { page, limit },
+    });
+    
+    // Decrypt messages if encryption is enabled
+    if (encryptionService.isEncryptionReady() && response.data.data) {
+      response.data.data = response.data.data.map((message: DirectMessage) => {
+        if (message.is_encrypted) {
+          try {
+            const decryptedContent = encryptionService.decryptDirectMessage(
+              {
+                encrypted_content: message.encrypted_content,
+                is_encrypted: message.is_encrypted,
+                content: message.content
+              },
+              message.sender_id,
+              message.receiver_id
+            );
+            return { ...message, content: decryptedContent };
+          } catch (error) {
+            console.error('Failed to decrypt DM:', error);
+            return { ...message, content: '[DECRYPTION FAILED]' };
+          }
+        }
+        return message;
+      });
+    }
+    
+    return response.data;
+  },
+
+  sendDirectMessage: async (
+    receiverId: number,
+    content: string,
+    replyTo?: number
+  ): Promise<ApiResponse<{ data: DirectMessage }>> => {
+    let messageData: any = { content, replyTo };
+    
+    // Encrypt message content if encryption is enabled
+    if (encryptionService.isEncryptionReady()) {
+      try {
+        // Get current user ID (you'd need to get this from auth context)
+        const currentUserId = parseInt(localStorage.getItem('currentUserId') || '0');
+        const encrypted = encryptionService.encryptDirectMessage(content, currentUserId, receiverId);
+        
+        messageData = {
+          content: '[ENCRYPTED]', // Placeholder for server
+          encrypted_content: encrypted.encrypted_content,
+          is_encrypted: encrypted.is_encrypted,
+          encryption_version: String(encrypted.encryption_version),
+          replyTo
+        };
+      } catch (error) {
+        console.error('Failed to encrypt DM:', error);
+        // Fallback to unencrypted if encryption fails
+      }
+    }
+    
+    const response = await api.post(`/dm/send/${receiverId}`, messageData);
+    
+    // Decrypt the response if needed
+    if (encryptionService.isEncryptionReady() && response.data.data && response.data.data.is_encrypted) {
+      try {
+        const decryptedContent = encryptionService.decryptDirectMessage(
+          {
+            encrypted_content: response.data.data.encrypted_content,
+            is_encrypted: response.data.data.is_encrypted,
+            content: response.data.data.content
+          },
+          response.data.data.sender_id,
+          response.data.data.receiver_id
+        );
+        response.data.data.content = decryptedContent;
+      } catch (error) {
+        console.error('Failed to decrypt response DM:', error);
+      }
+    }
+    
+    return response.data;
+  },
+
+  startConversation: async (userId: number): Promise<ApiResponse<{ conversation: DMConversation }>> => {
+    const response = await api.post('/dm/conversations', { userId });
+    return response.data;
+  },
+
+  markAsRead: async (conversationId: string): Promise<ApiResponse> => {
+    const response = await api.put(`/dm/conversations/${conversationId}/read`);
     return response.data;
   },
 };

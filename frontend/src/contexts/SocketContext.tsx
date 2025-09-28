@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useRef, ReactNod
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { soundManager } from '../utils/sounds';
+import encryptionService from '../services/encryptionService';
 import { SocketContextType, Message } from '../types';
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
@@ -107,7 +108,27 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
       // Message event handlers
       newSocket.on('new_message', (message: Message) => {
-        setMessages(prev => [...prev, message]);
+        let processedMessage = { ...message };
+        
+        // Decrypt message if encryption is enabled and message is encrypted
+        if (encryptionService.isEncryptionReady() && message.is_encrypted) {
+          try {
+            const decryptedContent = encryptionService.decryptMessage(
+              {
+                content: message.content,
+                encrypted_content: message.encrypted_content,
+                is_encrypted: message.is_encrypted
+              },
+              message.channel_id
+            );
+            processedMessage.content = decryptedContent;
+          } catch (error) {
+            console.error('Failed to decrypt incoming message:', error);
+            processedMessage.content = '[DECRYPTION FAILED]';
+          }
+        }
+        
+        setMessages(prev => [...prev, processedMessage]);
         // Play sound notification for new messages (except your own)
         if (message.user_id !== user?.id) {
           soundManager.newMessage();

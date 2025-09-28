@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authAPI, handleApiError } from '../services/api';
+import encryptionService from '../services/encryptionService';
 import { User, AuthContextType } from '../types';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,11 +24,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setLoading(true);
       const response = await authAPI.getCurrentUser() as any;
       if (response && (response.user || response.data?.user)) {
-        setUser(response.user || response.data?.user);
+        const userData = response.user || response.data?.user;
+        setUser(userData);
+        
+        // Store current user ID for DM encryption
+        localStorage.setItem('currentUserId', String(userData.id));
+        
+        // Note: Encryption session will need to be restored when user provides password
+        // This happens during login. For existing sessions, we can't restore encryption
+        // without the user's password due to security requirements.
+        console.log('ℹ️ User authenticated - encryption will be available after next login');
       }
     } catch (error: any) {
       // User is not authenticated, clear any existing state
       setUser(null);
+      encryptionService.clearEncryption();
+      localStorage.removeItem('currentUserId');
       console.log('No authenticated user found');
     } finally {
       setLoading(false);
@@ -42,7 +54,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response = await authAPI.login({ email, password }) as any;
       
       if (response && (response.user || response.data?.user)) {
-        setUser(response.user || response.data?.user);
+        const userData = response.user || response.data?.user;
+        setUser(userData);
+        
+        // Initialize encryption service with user credentials
+        try {
+          await encryptionService.initializeEncryption(userData.id, password);
+          console.log('✅ Encryption initialized successfully');
+          
+          // Store current user ID for DM encryption
+          localStorage.setItem('currentUserId', String(userData.id));
+        } catch (encryptionError) {
+          console.error('❌ Failed to initialize encryption:', encryptionError);
+          // Don't fail login if encryption initialization fails
+        }
       }
     } catch (error: any) {
       const errorMessage = handleApiError(error);
@@ -77,9 +102,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setError('');
       await authAPI.logout();
       setUser(null);
+      
+      // Clear encryption state
+      encryptionService.clearEncryption();
+      localStorage.removeItem('currentUserId');
     } catch (error: any) {
       // Even if logout fails, clear user locally
       setUser(null);
+      encryptionService.clearEncryption();
+      localStorage.removeItem('currentUserId');
       console.error('Logout error:', error);
     }
   };

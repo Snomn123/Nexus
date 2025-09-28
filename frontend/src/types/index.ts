@@ -60,6 +60,10 @@ export interface Message {
   edited: boolean;
   created_at: string;
   updated_at: string;
+  // Encryption fields
+  encrypted_content?: string;
+  is_encrypted?: boolean;
+  encryption_version?: string;
 }
 
 // API Response types
@@ -93,6 +97,18 @@ export interface JoinServerRequest {
 export interface SendMessageRequest {
   content: string;
   replyTo?: number;
+  // Encryption fields (optional, populated when encryption is enabled)
+  encrypted_content?: string;
+  is_encrypted?: boolean;
+  encryption_version?: string;
+}
+
+export interface EditMessageRequest {
+  content: string;
+  // Encryption fields (optional, populated when encryption is enabled)
+  encrypted_content?: string;
+  is_encrypted?: boolean;
+  encryption_version?: string;
 }
 
 // Socket event types
@@ -109,6 +125,10 @@ export interface SocketMessage {
   edited: boolean;
   created_at: string;
   updated_at: string;
+  // Encryption fields
+  encrypted_content?: string;
+  is_encrypted?: boolean;
+  encryption_version?: string;
 }
 
 export interface TypingEvent {
@@ -162,6 +182,10 @@ export interface DirectMessage {
   read: boolean;
   created_at: string;
   updated_at: string;
+  // Encryption fields
+  encrypted_content?: string;
+  is_encrypted?: boolean;
+  encryption_version?: string;
 }
 
 export interface DMConversation {
