@@ -1,5 +1,6 @@
 const { body, validationResult } = require('express-validator');
 const db = require('../config/database');
+const { sanitizeHtml, validateContentLength } = require('../utils/security');
 
 const getChannelMessages = async (req, res) => {
     try {
@@ -61,8 +62,18 @@ const sendMessage = async (req, res) => {
         }
 
         const { channelId } = req.params;
-        const { content, replyTo } = req.body;
+        const { replyTo } = req.body;
         const userId = req.user.id;
+        
+        // Sanitize and validate content
+        let content = sanitizeHtml(req.body.content || '');
+        if (!validateContentLength(content, 2000)) {
+            return res.status(400).json({ error: 'Message content is too long (max 2000 characters)' });
+        }
+        
+        if (content.trim().length === 0) {
+            return res.status(400).json({ error: 'Message content cannot be empty' });
+        }
 
         // Check if user has access to channel
         const channelResult = await db.query(`

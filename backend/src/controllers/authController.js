@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const { body, validationResult } = require('express-validator');
 const db = require('../config/database');
 const { generateTokens, verifyRefreshToken } = require('../middleware/auth');
+const { sanitizeUsername, sanitizeEmail } = require('../utils/security');
 
 const register = async (req, res) => {
     try {
@@ -10,7 +11,22 @@ const register = async (req, res) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { username, email, password } = req.body;
+        const rawUsername = req.body.username;
+        const rawEmail = req.body.email;
+        const { password } = req.body;
+
+        // Sanitize inputs
+        const username = sanitizeUsername(rawUsername);
+        const email = sanitizeEmail(rawEmail);
+        
+        // Validate sanitized inputs
+        if (!username || username.length < 3 || username.length > 20) {
+            return res.status(400).json({ error: 'Username must be 3-20 characters and contain only letters, numbers, spaces, underscores, and hyphens' });
+        }
+        
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({ error: 'Please provide a valid email address' });
+        }
 
         // Check if user already exists
         const existingUser = await db.query(
@@ -98,7 +114,12 @@ const login = async (req, res) => {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        const { email, password } = req.body;
+        const { password } = req.body;
+        const email = sanitizeEmail(req.body.email);
+        
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
+        }
 
         // Find user
         const userResult = await db.query(

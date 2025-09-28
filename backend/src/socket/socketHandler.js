@@ -72,22 +72,8 @@ class SocketHandler {
                 next();
                 
             } catch (error) {
-                console.error('❌ Socket.IO authentication error:', error);
-                // Only allow debug fallback if explicitly enabled
-                if (process.env.NODE_ENV !== 'production' && process.env.SOCKET_DEBUG_AUTH === 'true') {
-                    console.warn('⚠️ WARNING: Using debug authentication - this should only be used for development testing');
-                    console.warn('⚠️ To disable this, remove SOCKET_DEBUG_AUTH=true from your environment');
-                    socket.user = {
-                        id: 999,
-                        username: 'debug-user',
-                        email: 'debug@example.com',
-                        avatar_url: null,
-                        status: 'online'
-                    };
-                    next();
-                } else {
-                    next(new Error('Authentication failed'));
-                }
+                console.error('❌ Socket.IO authentication error:', error.message);
+                next(new Error('Authentication failed'));
             }
         });
     }

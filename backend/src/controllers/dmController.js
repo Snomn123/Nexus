@@ -1,5 +1,6 @@
 const db = require('../config/database');
 const crypto = require('crypto');
+const { sanitizeHtml, validateContentLength } = require('../utils/security');
 
 const dmController = {
   // Get user's DM conversations
@@ -150,10 +151,20 @@ const dmController = {
   sendDirectMessage: async (req, res) => {
     try {
       const senderId = req.user.id;
-      const { receiver_id, content, reply_to, conversation_id } = req.body;
+      const { receiver_id, reply_to, conversation_id } = req.body;
 
-      if (!receiver_id || !content) {
+      if (!receiver_id || !req.body.content) {
         return res.status(400).json({ message: 'Receiver ID and content are required' });
+      }
+
+      // Sanitize and validate content
+      const content = sanitizeHtml(req.body.content);
+      if (!validateContentLength(content, 2000)) {
+        return res.status(400).json({ message: 'Message content is too long (max 2000 characters)' });
+      }
+      
+      if (content.trim().length === 0) {
+        return res.status(400).json({ message: 'Message content cannot be empty' });
       }
 
       // Check if users are friends
