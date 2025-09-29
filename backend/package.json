@@ -10,6 +10,7 @@
     "migrate:status": "node migrate-cli.js status",
     "migrate:create": "node migrate-cli.js create",
     "migrate:help": "node migrate-cli.js help",
+    "lint": "echo \"No linting configured for backend\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
