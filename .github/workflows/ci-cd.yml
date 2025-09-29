@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: 📥 Checkout Repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
       
-    - name: 🔧 Setup Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
@@ -36,7 +36,7 @@ jobs:
         cd frontend
         npm run lint
         
-    - name: 🏗️ Build Frontend
+    - name: Build Frontend
       run: |
         cd frontend
         npm run build
@@ -83,27 +83,27 @@ jobs:
           - 6379:6379
     
     steps:
-    - name: 📥 Checkout Repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
       
-    - name: 🔧 Setup Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
         cache-dependency-path: backend/package-lock.json
         
-    - name: 📦 Install Backend Dependencies
+    - name: Install Backend Dependencies
       run: |
         cd backend
         npm ci
         
-    - name: 🔍 Lint Backend Code
+    - name: Lint Backend Code
       run: |
         cd backend
         npm run lint
         
-    - name: 🗄️ Run Database Migrations
+    - name: Run Database Migrations
       run: |
         cd backend
         npm run migrate
@@ -119,7 +119,7 @@ jobs:
         JWT_SECRET: test-secret
         JWT_REFRESH_SECRET: test-refresh-secret
         
-    - name: 🧪 Run Backend Tests
+    - name: Run Backend Tests
       run: |
         cd backend
         npm test -- --coverage
@@ -135,7 +135,7 @@ jobs:
         JWT_SECRET: test-secret
         JWT_REFRESH_SECRET: test-refresh-secret
         
-    - name: 📊 Upload Backend Coverage
+    - name: Upload Backend Coverage
       uses: codecov/codecov-action@v3
       with:
         flags: backend
@@ -147,31 +147,31 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: 📥 Checkout Repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
       
-    - name: 🔧 Setup Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         
-    - name: 🛡️ Run Security Audit (Frontend)
+    - name: Run Security Audit (Frontend)
       run: |
         cd frontend
         npm audit --audit-level moderate
         
-    - name: 🛡️ Run Security Audit (Backend)
+    - name: Run Security Audit (Backend)
       run: |
         cd backend
         npm audit --audit-level moderate
         
-    - name: 🔍 Initialize CodeQL
-      uses: github/codeql-action/init@v2
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
       with:
         languages: javascript
         
-    - name: 🔍 Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
 
   # Docker Build Test
   docker-build:
@@ -179,22 +179,22 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: 📥 Checkout Repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
       
-    - name: 🐳 Set up Docker Buildx
+    - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
       
-    - name: 🏗️ Build Frontend Image
-      uses: docker/build-push-action@v5
+    - name: Build Frontend Image
+      uses: docker/build-push-action@v4
       with:
         context: ./frontend
         file: ./frontend/Dockerfile
         push: false
         tags: nexus-frontend:test
         
-    - name: 🏗️ Build Backend Image
-      uses: docker/build-push-action@v5
+    - name: Build Backend Image
+      uses: docker/build-push-action@v4
       with:
         context: ./backend
         file: ./backend/Dockerfile
@@ -208,25 +208,25 @@ jobs:
     needs: [frontend-test, backend-test]
     
     steps:
-    - name: 📥 Checkout Repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
       
-    - name: 🐳 Start Services
+    - name: Start Services
       run: |
         docker-compose up -d postgres redis
         sleep 10
         
-    - name: 🔧 Setup Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ env.NODE_VERSION }}
         
-    - name: 📦 Install Dependencies
+    - name: Install Dependencies
       run: |
         cd backend && npm ci
         cd ../frontend && npm ci
         
-    - name: 🗄️ Setup Test Database
+    - name: Setup Test Database
       run: |
         cd backend
         npm run migrate
@@ -238,7 +238,7 @@ jobs:
         DB_USER: postgres
         DB_PASSWORD: password
         
-    - name: 🧪 Run Integration Tests
+    - name: Run Integration Tests
       run: |
         cd backend
         npm run test:integration
@@ -266,21 +266,21 @@ jobs:
       url: https://nexus.example.com
       
     steps:
-    - name: 📥 Checkout Repository
+    - name: Checkout Repository
       uses: actions/checkout@v4
       
-    - name: 🚀 Deploy to Production
+    - name: Deploy to Production
       run: |
-        echo "🚀 Deploying to production..."
+        echo "Deploying to production..."
         echo "This would trigger your deployment process"
         # Add your deployment commands here
         
-    - name: 📢 Notify Deployment
-      uses: 8398a7/action-slack@v3
+    - name: Notify Deployment
+      uses: 8398a7/action-slack@v4
       with:
         status: ${{ job.status }}
         channel: '#deployments'
-        text: '🚀 Nexus has been deployed to production!'
+        text: 'Nexus has been deployed to production'
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
       if: always()
