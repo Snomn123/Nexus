@@ -11,7 +11,7 @@
     "migrate:create": "node migrate-cli.js create",
     "migrate:help": "node migrate-cli.js help",
     "lint": "echo \"No linting configured for backend\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test test/*.test.js"
   },
   "keywords": [
     "nexus",

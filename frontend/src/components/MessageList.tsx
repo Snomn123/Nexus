@@ -167,7 +167,7 @@ export const MessageList: React.FC<MessageListProps> = memo(({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { typingUsers } = useSocket();
   
-  const currentChannelTyping = typingUsers[channelId] || [];
+  const currentChannelTyping = useMemo(() => typingUsers[channelId] || [], [typingUsers, channelId]);
 
   // Auto-scroll to bottom when new messages arrive - instant for performance
   useEffect(() => {

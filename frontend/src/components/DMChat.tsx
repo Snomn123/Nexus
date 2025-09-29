@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDM } from '../contexts/DMContext';
-import { useAuth } from '../contexts/AuthContext';
 import { DirectMessage } from '../types';
 import { getAvatarColor, getUsernameColor } from '../utils/avatarColors';
 import './DMChat.css';
@@ -14,7 +13,6 @@ const DMChat: React.FC = () => {
     error, 
     sendDirectMessage 
   } = useDM();
-  const { user } = useAuth();
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);

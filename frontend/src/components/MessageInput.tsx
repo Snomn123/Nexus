@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, forwardRef } from 'react';
+import React, { useState, useRef, useEffect, forwardRef, useCallback } from 'react';
 import { useSocket } from '../contexts/SocketContext';
 
 interface MessageInputProps {
@@ -63,7 +63,7 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
     }
   };
 
-  const handleStopTyping = () => {
+  const handleStopTyping = useCallback(() => {
     if (isTyping) {
       setIsTyping(false);
       stopTyping(channelId);
@@ -73,7 +73,7 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = null;
     }
-  };
+  }, [isTyping, channelId, stopTyping]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -90,13 +90,13 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
       }
       handleStopTyping();
     };
-  }, []);
+  }, [handleStopTyping]);
 
   // Stop typing when channel changes
   useEffect(() => {
     handleStopTyping();
     setMessage('');
-  }, [channelId]);
+  }, [channelId, handleStopTyping]);
 
   // Focus input when component mounts
   useEffect(() => {

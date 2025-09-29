@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { DirectMessage, DMConversation, DMContextType, ApiResponse } from '../types';
 import { useAuth } from './AuthContext';
 import api from '../services/api';
@@ -19,39 +19,7 @@ export const DMProvider: React.FC<DMProviderProps> = ({ children, onSwitchToDMs 
 
   const { user } = useAuth();
 
-  // Load conversations when user logs in
-  useEffect(() => {
-    if (user) {
-      refreshConversations();
-    } else {
-      // Clear data when user logs out
-      setConversations([]);
-      setActiveConversationState(null);
-      setMessages([]);
-    }
-  }, [user]);
-
-  // Auto-clear unread badges when conversations are loaded (handles refresh case)
-  useEffect(() => {
-    if (conversations.length > 0 && activeConversation) {
-      const currentConv = conversations.find(c => c.id === activeConversation.id);
-      if (currentConv && currentConv.unread_count > 0) {
-        console.log('Auto-clearing unread badge on refresh for active conversation:', currentConv.id);
-        markMessagesAsRead(currentConv.id);
-      }
-    }
-  }, [conversations, activeConversation]);
-
-  // Load messages when active conversation changes
-  useEffect(() => {
-    if (activeConversation) {
-      refreshMessages(activeConversation.id);
-    } else {
-      setMessages([]);
-    }
-  }, [activeConversation]);
-
-  const refreshConversations = async () => {
+  const refreshConversations = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -75,9 +43,9 @@ export const DMProvider: React.FC<DMProviderProps> = ({ children, onSwitchToDMs 
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const refreshMessages = async (conversationId: string) => {
+  const refreshMessages = useCallback(async (conversationId: string) => {
     if (!user) return;
     
     try {
@@ -92,7 +60,39 @@ export const DMProvider: React.FC<DMProviderProps> = ({ children, onSwitchToDMs 
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  // Load conversations when user logs in
+  useEffect(() => {
+    if (user) {
+      refreshConversations();
+    } else {
+      // Clear data when user logs out
+      setConversations([]);
+      setActiveConversationState(null);
+      setMessages([]);
+    }
+  }, [user, refreshConversations]);
+
+  // Auto-clear unread badges when conversations are loaded (handles refresh case)
+  useEffect(() => {
+    if (conversations.length > 0 && activeConversation) {
+      const currentConv = conversations.find(c => c.id === activeConversation.id);
+      if (currentConv && currentConv.unread_count > 0) {
+        console.log('Auto-clearing unread badge on refresh for active conversation:', currentConv.id);
+        markMessagesAsRead(currentConv.id);
+      }
+    }
+  }, [conversations, activeConversation]);
+
+  // Load messages when active conversation changes
+  useEffect(() => {
+    if (activeConversation) {
+      refreshMessages(activeConversation.id);
+    } else {
+      setMessages([]);
+    }
+  }, [activeConversation, refreshMessages]);
 
   const setActiveConversation = (conversation: DMConversation | null) => {
     setActiveConversationState(conversation);
