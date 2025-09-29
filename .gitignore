@@ -31,7 +31,7 @@ backend/.env
 backend/.env.production
 backend/.env.staging
 frontend/.env
-frontend/.env.production
+# frontend/.env.production - allowed for GitHub Pages deployment
 frontend/.env.staging
 
 # Production data directories
