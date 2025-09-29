@@ -38,6 +38,15 @@ print_status "Installing Node.js 18..."
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs build-essential
 
+print_status "Verifying Node.js installation..."
+NODE_VERSION=$(node --version)
+NODE_MAJOR=$(echo $NODE_VERSION | sed 's/v\([0-9]*\).*/\1/')
+if [ "$NODE_MAJOR" -lt 18 ]; then
+    print_error "Node.js version $NODE_VERSION is not supported. Requires Node.js 18+"
+    exit 1
+fi
+print_success "Node.js $NODE_VERSION installed successfully"
+
 print_status "Installing PostgreSQL and Redis..."
 sudo apt install -y postgresql postgresql-contrib redis-server
 

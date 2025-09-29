@@ -1,7 +1,7 @@
 # Multi-stage production Dockerfile for Nexus Frontend
 
 # Stage 1: Build stage
-FROM node:18-alpine AS builder
+FROM node:18-alpine as build
 
 WORKDIR /app
 
