@@ -20,6 +20,9 @@ const dmRoutes = require('./routes/dm');
 const app = express();
 const server = http.createServer(app);
 
+// Trust proxy for nginx reverse proxy
+app.set('trust proxy', true);
+
 // Socket.IO setup with CORS
 const allowedOrigins = [
     process.env.FRONTEND_URL || "http://localhost:3000",
