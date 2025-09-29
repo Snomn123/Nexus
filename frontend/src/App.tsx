@@ -56,6 +56,7 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
   const [channelMessages, setChannelMessages] = useState<Message[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
+  const [showQuickSwitcher, setShowQuickSwitcher] = useState(false);
   const [showServerBrowser, setShowServerBrowser] = useState(false);
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [showServerSettings, setShowServerSettings] = useState(false);
@@ -76,6 +77,15 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
     await loadServerDetails(server.id);
     onViewChange('server');
   }, [onViewChange]);
+
+  // Back to DMs handler
+  const handleBackToDMs = useCallback(() => {
+    onViewChange('dms');
+    setActiveServer(null);
+    setActiveChannel(null);
+    setChannelMessages([]);
+    clearMessages();
+  }, [onViewChange, clearMessages]);
 
 
 
@@ -207,6 +217,9 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
   }, [activeServer?.channels]);
 
   // Keyboard shortcut handlers
+  const handleQuickSwitcher = () => {
+    setShowQuickSwitcher(true);
+  };
 
   const handleFocusMessageInput = () => {
     messageInputRef.current?.focus();
@@ -227,12 +240,16 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
     }
   };
 
-
+  const handleEscape = () => {
+    setShowQuickSwitcher(false);
+  };
 
   // Initialize keyboard shortcuts
   useKeyboardShortcuts({
+    onQuickSwitcher: handleQuickSwitcher,
     onFocusMessageInput: handleFocusMessageInput,
-    onGoToChannel: handleChannelNavigation
+    onGoToChannel: handleChannelNavigation,
+    onEscape: handleEscape
   });
 
   return (

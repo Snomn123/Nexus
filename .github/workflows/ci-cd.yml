@@ -122,7 +122,7 @@ jobs:
     - name: Run Backend Tests
       run: |
         cd backend
-        npm test -- --coverage
+        npm run test:coverage
       env:
         NODE_ENV: test
         DB_HOST: localhost
@@ -139,7 +139,8 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         flags: backend
-        directory: backend/coverage
+        # Node.js built-in test runner doesn't generate lcov files
+        # Coverage is reported in the test output above
 
   # Security Scanning
   security-scan:

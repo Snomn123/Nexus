@@ -11,7 +11,8 @@
     "migrate:create": "node migrate-cli.js create",
     "migrate:help": "node migrate-cli.js help",
     "lint": "echo \"No linting configured for backend\"",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage test/*.test.js"
   },
   "keywords": [
     "nexus",
