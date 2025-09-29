@@ -1,8 +1,8 @@
 # Contributing to Nexus
 
-Thank you for your interest in contributing to Nexus! This document provides guidelines and information for contributors.
+This document provides guidelines for contributing to Nexus.
 
-## 🎯 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 18+
@@ -31,13 +31,13 @@ Thank you for your interest in contributing to Nexus! This document provides gui
    cd ../frontend && npm install && npm start
    ```
 
-## 📋 Development Guidelines
+## Development Guidelines
 
 ### Code Standards
-- **TypeScript**: Use strict typing, avoid `any` types
-- **ESLint**: Follow the configured rules (Airbnb + custom)
-- **Prettier**: Code is auto-formatted on save
-- **Naming**: Use descriptive variable and function names
+- TypeScript: Use strict typing, avoid `any` types
+- ESLint: Follow configured rules (Airbnb + custom)
+- Prettier: Code is auto-formatted on save
+- Naming: Use descriptive variable and function names
 
 ### Commit Messages
 Follow conventional commits format:
@@ -58,7 +58,7 @@ test(e2e): add user registration flow tests
 - `docs/description` - Documentation updates
 - `refactor/description` - Code refactoring
 
-## 🔍 Pull Request Process
+## Pull Request Process
 
 ### Before Submitting
 1. **Test your changes**
@@ -115,7 +115,7 @@ Add screenshots for UI changes
 - [ ] Documentation updated
 ```
 
-## 🐛 Bug Reports
+## Bug Reports
 
 ### Before Reporting
 1. Check existing issues
@@ -148,7 +148,7 @@ Add screenshots if applicable
 Any other relevant information
 ```
 
-## 💡 Feature Requests
+## Feature Requests
 
 ### Feature Request Template
 ```markdown
@@ -165,7 +165,7 @@ Alternative solutions you've considered
 Any other context, screenshots, or mockups
 ```
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 ### Frontend Structure
 ```
@@ -189,7 +189,7 @@ src/
 └── utils/          # Helper functions
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Frontend Testing
 - **Unit Tests**: Jest + React Testing Library
@@ -216,7 +216,7 @@ npm run test:watch          # Watch mode
 npm run test:coverage       # Coverage report
 ```
 
-## 🔐 Security
+## Security
 
 ### Reporting Security Issues
 **DO NOT** create public issues for security vulnerabilities.
@@ -236,7 +236,7 @@ Include:
 - Validate all user inputs
 - Use prepared statements for database queries
 
-## 📚 Resources
+## Resources
 
 ### Learning Resources
 - [React Documentation](https://reactjs.org/docs)
@@ -249,7 +249,7 @@ Include:
 - [Project Board](https://github.com/Snomn123/Nexus/projects)
 - [Wiki](https://github.com/Snomn123/Nexus/wiki)
 
-## 💬 Community
+## Community
 
 ### Communication Channels
 - **GitHub Discussions**: General questions and ideas
@@ -259,11 +259,11 @@ Include:
 ### Code of Conduct
 We are committed to providing a friendly, safe, and welcoming environment for all contributors. Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## 🎉 Recognition
+## Recognition
 
 Contributors will be recognized in:
 - README.md contributors section
 - Release notes for significant contributions
 - Special contributor badge (future feature)
 
-Thank you for contributing to Nexus! 🚀
+Thank you for contributing to Nexus.

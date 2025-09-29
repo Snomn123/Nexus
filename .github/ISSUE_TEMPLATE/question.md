@@ -1,15 +1,15 @@
 ---
-name: ❓ Question
+name: Question
 about: Ask a question about Nexus usage, setup, or development
 title: '[QUESTION] '
 labels: ['question', 'needs-triage']
 assignees: ''
 ---
 
-## ❓ Question
+## Question
 What would you like to know about Nexus?
 
-## 🎯 Category
+## Category
 What category does your question fall into?
 - [ ] Installation/Setup
 - [ ] Usage/Features
@@ -20,7 +20,7 @@ What category does your question fall into?
 - [ ] Performance
 - [ ] Other
 
-## 🔍 Context
+## Context
 Provide any relevant context for your question:
 - What are you trying to achieve?
 - What have you tried so far?

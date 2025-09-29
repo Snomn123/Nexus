@@ -1,15 +1,15 @@
 ---
-name: 📚 Documentation Issue
+name: Documentation Issue
 about: Report an issue with documentation or suggest documentation improvements
 title: '[DOCS] '
 labels: ['documentation', 'needs-triage']
 assignees: ''
 ---
 
-## 📚 Documentation Issue
+## Documentation Issue
 Describe the issue with the documentation.
 
-## 📍 Location
+## Location
 Where is the documentation issue located?
 - [ ] README.md
 - [ ] CONTRIBUTING.md
@@ -18,10 +18,10 @@ Where is the documentation issue located?
 - [ ] Wiki
 - [ ] Other: ___________
 
-## 🔗 URL/File
+## URL/File
 Provide a link or file path to the problematic documentation.
 
-## 🐛 Issue Type
+## Issue Type
 What type of documentation issue is this?
 - [ ] Missing information
 - [ ] Incorrect information
@@ -31,10 +31,10 @@ What type of documentation issue is this?
 - [ ] Formatting issues
 - [ ] Typos/Grammar
 
-## ✅ Suggested Fix
+## Suggested Fix
 If you have suggestions for how to fix this, please describe them.
 
-## 🎯 Context
+## Context
 Who would benefit from this documentation improvement?
 - [ ] New contributors
 - [ ] End users

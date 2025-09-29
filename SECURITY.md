@@ -11,27 +11,27 @@
 
 Nexus implements multiple layers of security:
 
-### 🔐 End-to-End Encryption
-- **AES-256-CBC encryption** for all messages
-- **PBKDF2 key derivation** (100,000 iterations)
-- **Zero-knowledge architecture** - server cannot read messages
-- **Channel-specific encryption keys**
+### End-to-End Encryption
+- AES-256-CBC encryption for all messages
+- PBKDF2 key derivation (100,000 iterations)
+- Zero-knowledge architecture - server cannot read messages
+- Channel-specific encryption keys
 
-### 🔒 Authentication & Authorization
-- **JWT tokens** with refresh rotation
-- **bcrypt password hashing** (12 rounds)
-- **HTTP-only cookies** for token storage
-- **Rate limiting** on authentication endpoints
+### Authentication & Authorization
+- JWT tokens with refresh rotation
+- bcrypt password hashing (12 rounds)
+- HTTP-only cookies for token storage
+- Rate limiting on authentication endpoints
 
-### 🛡️ Infrastructure Security
-- **HTTPS/WSS** for all communications
-- **CORS protection** configured
-- **Input validation** on all endpoints
-- **SQL injection prevention** with parameterized queries
+### Infrastructure Security
+- HTTPS/WSS for all communications
+- CORS protection configured
+- Input validation on all endpoints
+- SQL injection prevention with parameterized queries
 
 ## Reporting a Vulnerability
 
-### 🚨 Critical Security Issues
+### Critical Security Issues
 For critical security vulnerabilities, please **DO NOT** create a public GitHub issue.
 
 **Contact us directly:**
@@ -49,7 +49,7 @@ Please provide the following information:
 5. **Proof of concept** (if applicable)
 6. **Suggested mitigation** (if any)
 
-### 🔄 Process Timeline
+### Process Timeline
 
 | Stage | Timeline | Description |
 |-------|----------|-------------|
@@ -59,7 +59,7 @@ Please provide the following information:
 | **Resolution** | 2-4 weeks | We deploy fixes and notify reporters |
 | **Disclosure** | 30+ days | Public disclosure after fix deployment |
 
-### 🏆 Recognition
+### Recognition
 
 We believe in recognizing security researchers who help keep Nexus secure:
 
@@ -89,14 +89,14 @@ We believe in recognizing security researchers who help keep Nexus secure:
 
 ## Vulnerability Disclosure Policy
 
-### 🎯 Scope
+### Scope
 This policy applies to vulnerabilities in:
 - Nexus application code
 - Infrastructure configuration
 - Third-party dependencies
 - Deployment configurations
 
-### ✅ Authorized Testing
+### Authorized Testing
 You may test for vulnerabilities if you:
 - Use your own test accounts
 - Don't access other users' data
@@ -104,7 +104,7 @@ You may test for vulnerabilities if you:
 - Don't exploit vulnerabilities for malicious purposes
 - Report findings responsibly
 
-### ❌ Prohibited Activities
+### Prohibited Activities
 - Social engineering attacks
 - Physical attacks on infrastructure
 - Denial of Service (DoS) attacks
@@ -167,4 +167,4 @@ You may test for vulnerabilities if you:
 **Last Updated**: September 28, 2025
 **Version**: 1.0
 
-Thank you for helping keep Nexus secure! 🔒
+Thank you for helping keep Nexus secure.

@@ -1,4 +1,4 @@
-name: 🚀 CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -12,7 +12,7 @@ env:
 jobs:
   # Frontend Testing
   frontend-test:
-    name: 🎨 Frontend Tests
+    name: Frontend Tests
     runs-on: ubuntu-latest
     
     steps:
@@ -26,12 +26,12 @@ jobs:
         cache: 'npm'
         cache-dependency-path: frontend/package-lock.json
         
-    - name: 📦 Install Frontend Dependencies
+    - name: Install Frontend Dependencies
       run: |
         cd frontend
         npm ci
         
-    - name: 🔍 Lint Frontend Code
+    - name: Lint Frontend Code
       run: |
         cd frontend
         npm run lint
@@ -41,12 +41,12 @@ jobs:
         cd frontend
         npm run build
         
-    - name: 🧪 Run Frontend Tests
+    - name: Run Frontend Tests
       run: |
         cd frontend
         npm test -- --coverage --watchAll=false
         
-    - name: 📊 Upload Frontend Coverage
+    - name: Upload Frontend Coverage
       uses: codecov/codecov-action@v3
       with:
         flags: frontend
@@ -54,7 +54,7 @@ jobs:
         
   # Backend Testing  
   backend-test:
-    name: 🔧 Backend Tests
+    name: Backend Tests
     runs-on: ubuntu-latest
     
     services:
@@ -143,7 +143,7 @@ jobs:
 
   # Security Scanning
   security-scan:
-    name: 🔒 Security Scan
+    name: Security Scan
     runs-on: ubuntu-latest
     
     steps:
@@ -175,7 +175,7 @@ jobs:
 
   # Docker Build Test
   docker-build:
-    name: 🐳 Docker Build Test
+    name: Docker Build Test
     runs-on: ubuntu-latest
     
     steps:
@@ -203,7 +203,7 @@ jobs:
 
   # Integration Tests
   integration-test:
-    name: 🔗 Integration Tests
+    name: Integration Tests
     runs-on: ubuntu-latest
     needs: [frontend-test, backend-test]
     
@@ -256,7 +256,7 @@ jobs:
 
   # Deployment (Production only)
   deploy:
-    name: 🚀 Deploy to Production
+    name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [frontend-test, backend-test, security-scan, docker-build, integration-test]
     if: github.ref == 'refs/heads/production' && github.event_name == 'push'

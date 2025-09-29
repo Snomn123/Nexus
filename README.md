@@ -1,59 +1,51 @@
-# Nexus - Real-Time Discord Clone
+# Nexus
 
-<div align="center">
-  <h3>🚀 A modern, secure real-time communication platform</h3>
-  
-  [![Production Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)](https://github.com/Snomn123/Nexus)
-  [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org/)
-  [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
-  [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://docker.com/)
-  [![E2EE](https://img.shields.io/badge/Security-End--to--End%20Encrypted-red?logo=shield)](https://github.com/Snomn123/Nexus)
+[![Production Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)](https://github.com/Snomn123/Nexus)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker)](https://docker.com/)
+[![E2EE](https://img.shields.io/badge/Security-End--to--End%20Encrypted-red?logo=shield)](https://github.com/Snomn123/Nexus)
 
-  <p><em>Experience seamless communication with military-grade encryption, real-time messaging, and modern UI design.</em></p>
-</div>
+A real-time communication platform with end-to-end encryption, built with React, Node.js, and PostgreSQL.
 
----
+## Features
 
-## ✨ Features
+### Security & Privacy
+- End-to-End Encryption with AES-256
+- Zero-Knowledge Architecture - server cannot decrypt messages
+- JWT Authentication with refresh token rotation
+- HTTPS/WSS encrypted transport
 
-### 🔐 **Security & Privacy**
-- **🛡️ End-to-End Encryption** - AES-256 encryption ensures your messages stay private
-- **🔑 Zero-Knowledge Architecture** - Server administrators cannot read your messages
-- **🚪 JWT Authentication** - Secure login with refresh token rotation
-- **🔒 HTTPS/WSS** - All traffic encrypted in transit
+### Communication
+- Real-time messaging via WebSockets
+- Direct messages between users
+- Server channels for organized communication
+- Message replies and threading
+- Message editing and deletion
+- Typing indicators
 
-### 💬 **Communication**
-- **⚡ Real-Time Messaging** - Instant message delivery via WebSockets
-- **📱 Direct Messages** - Private conversations between friends
-- **🏟️ Server Channels** - Organized team communication
-- **↩️ Message Replies** - Thread-like conversation context
-- **✏️ Message Editing** - Edit and delete your messages
-- **👀 Typing Indicators** - See when others are typing
+### Social Features
+- Friend system with request management
+- Real-time presence indicators
+- User profiles with avatars
+- Generated avatar system
 
-### 👥 **Social Features**
-- **👫 Friend System** - Send and manage friend requests
-- **🟢 Online Presence** - Real-time user status indicators
-- **👤 User Profiles** - Customizable avatars and usernames
-- **🎨 Avatar System** - Colorful generated avatars
+### User Interface
+- Responsive design for desktop and mobile
+- Modern interface inspired by Discord
+- Sound notifications
+- Keyboard shortcuts
+- Paginated message history
 
-### 🎨 **User Experience**
-- **📱 Responsive Design** - Works perfectly on desktop and mobile
-- **🌙 Modern UI** - Clean, Discord-inspired interface
-- **🔊 Sound Notifications** - Audio cues for new messages
-- **⌨️ Keyboard Shortcuts** - Power user productivity features
-- **📄 Message History** - Paginated message loading
+## Architecture
 
----
-
-## 🏗️ Architecture
-
-### **Tech Stack**
-- **Frontend**: React 18 + TypeScript + Tailwind CSS
-- **Backend**: Node.js + Express + Socket.io
-- **Database**: PostgreSQL with Redis caching
-- **Security**: AES-256 encryption + PBKDF2 key derivation
-- **Infrastructure**: Docker + Docker Compose
+### Tech Stack
+- Frontend: React 18 + TypeScript + Tailwind CSS
+- Backend: Node.js + Express + Socket.io
+- Database: PostgreSQL with Redis caching
+- Security: AES-256 encryption + PBKDF2 key derivation
+- Infrastructure: Docker + Docker Compose
 
 ## Getting Started
 
@@ -64,104 +56,46 @@
 - npm or yarn
 - Git
 
-### Quick Start (Recommended)
+### Installation
 
-Option 1: Automated Setup (Easiest)
-
-1. Clone and run setup script
-   ```bash
-   git clone https://github.com/Snomn123/Nexus.git
-   cd Nexus
-   
-   # On Linux/Mac
-   chmod +x setup.sh && ./setup.sh
-   
-   # On Windows
-   setup.bat
-   ```
-
-2. Start the applications
-   ```bash
-   # Terminal 1: Start backend
-   cd backend
-   npm run dev
-   
-   # Terminal 2: Start frontend  
-   cd frontend
-   npm install && npm start
-   ```
-
-Option 2: Manual Setup
-
-1. Clone the repository
+1. Clone the repository:
    ```bash
    git clone https://github.com/Snomn123/Nexus.git
    cd Nexus
    ```
 
-2. Set up environment files
+2. Set up environment files:
    ```bash
-   # Copy environment files
    cp .env.docker.example .env.docker
    cp backend/.env.example backend/.env
    cp frontend/.env.example frontend/.env
    ```
 
-3. Start the databases
+3. Start with Docker:
    ```bash
-   # Start databases with Docker
-   docker-compose up -d postgres redis
+   docker-compose up -d
    ```
 
-4. Set up and run the applications
+4. Manual development setup:
    ```bash
-   # Install backend dependencies and run migrations
+   # Backend
    cd backend
    npm install
    npm run migrate
    npm run dev
 
-   # In a new terminal, install frontend dependencies
+   # Frontend (new terminal)
    cd frontend
    npm install
    npm start
    ```
 
-### Manual Installation (Alternative)
+## Configuration
 
-If you prefer to set up each component manually:
-
-1. Clone the repository
-   ```bash
-   git clone https://github.com/Snomn123/Nexus.git
-   cd Nexus
-   ```
-
-2. Start only the databases with Docker
-   ```bash
-   docker-compose up -d postgres redis
-   ```
-
-3. Set up the backend
-   ```bash
-   cd backend
-   cp .env.example .env
-   # Edit .env file with your database credentials if needed
-   npm install
-   ```
-
-4. Set up the frontend
-   ```bash
-   cd ../frontend
-   cp .env.example .env
-   # Edit .env file with your API URLs if needed
-   npm install
-   ```
-
-### Environment Configuration
+### Environment Variables
 
 #### Backend (.env)
-```bash
+```env
 NODE_ENV=development
 PORT=5000
 FRONTEND_URL=http://localhost:3000
@@ -175,36 +109,26 @@ DB_PASSWORD=password
 REDIS_HOST=localhost
 REDIS_PORT=6379
 
-JWT_SECRET=your-super-secret-jwt-key
-JWT_REFRESH_SECRET=your-super-secret-refresh-key
+JWT_SECRET=your-jwt-secret
+JWT_REFRESH_SECRET=your-refresh-secret
 ```
 
 #### Frontend (.env)
-```bash
+```env
 REACT_APP_API_URL=http://localhost:5000/api
 REACT_APP_SOCKET_URL=http://localhost:5000
 ```
 
 ### Database Setup
 
-The project includes a complete database schema that's ready to use:
+Database schema is automatically applied when starting PostgreSQL with Docker.
 
-Automatic Setup (Recommended)
-The database schema will be automatically applied when you start the PostgreSQL container with Docker.
-
-Manual Database Setup
-If you need to manually set up the database or reset it:
-
+Manual setup:
 ```bash
-# If using Docker (recommended)
 docker exec -i nexus_postgres psql -U postgres -d nexus < backend/schema.sql
-
-# If using a local PostgreSQL installation
-psql -U postgres -d nexus -f backend/schema.sql
 ```
 
-Migration System
-The project includes a built-in migration system for schema updates:
+Migration system:
 
 ```bash
 cd backend

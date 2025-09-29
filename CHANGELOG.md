@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### 🎯 Planned
+### Planned
 - Perfect Forward Secrecy with key rotation
 - Cross-device key synchronization
 - Hardware security key support (WebAuthn)
@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Database Migrations**: Versioned database schema management
 - **Security Features**: HTTPS, CORS, rate limiting, input validation
 
-### 🔐 Security
+### Security
 - **Zero-Knowledge Architecture**: Server cannot read encrypted messages
 - **PBKDF2 Key Derivation**: 100,000 iterations for password security
 - **Channel-Specific Keys**: Unique encryption keys per conversation
@@ -42,14 +42,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **JWT Token Refresh**: Automatic token rotation for security
 - **HTTP-Only Cookies**: Secure token storage
 
-### 🏗️ Architecture
+### Architecture
 - **Frontend**: React 18 + TypeScript + Tailwind CSS
 - **Backend**: Node.js + Express + Socket.io
 - **Database**: PostgreSQL with Redis caching
 - **Infrastructure**: Docker + Docker Compose
 - **CI/CD**: GitHub Actions pipeline
 
-### 📚 Documentation
+### Documentation
 - Comprehensive README with setup instructions
 - API documentation with examples
 - Contributing guidelines
@@ -59,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.9.0] - 2025-09-20
 
-### ✨ Added
+### Added
 - Basic messaging without encryption
 - User registration and login
 - Server and channel creation
@@ -67,20 +67,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PostgreSQL database integration
 - Redis session management
 
-### 🔧 Changed
+### Changed
 - Migrated from SQLite to PostgreSQL
 - Improved error handling and validation
 - Enhanced UI with Tailwind CSS
 - Better TypeScript type safety
 
-### 🐛 Fixed
+### Fixed
 - Socket connection stability issues
 - Message ordering problems
 - Authentication edge cases
 
 ## [0.5.0] - 2025-08-15
 
-### ✨ Added
+### Added
 - Initial project setup
 - Basic React frontend
 - Express.js backend
@@ -88,7 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - User authentication prototype
 - Basic messaging system
 
-### 🏗️ Technical
+### Technical
 - Project structure established
 - Development environment setup
 - Basic CI/CD pipeline
@@ -99,9 +99,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Release Date | Major Features |
 |---------|--------------|----------------|
-| **1.0.0** | 2025-09-28 | 🔐 End-to-End Encryption, Production Ready |
-| 0.9.0 | 2025-09-20 | 💬 Full Messaging System, PostgreSQL |
-| 0.5.0 | 2025-08-15 | 🚀 Initial Release, Basic Features |
+| **1.0.0** | 2025-09-28 | End-to-End Encryption, Production Ready |
+| 0.9.0 | 2025-09-20 | Full Messaging System, PostgreSQL |
+| 0.5.0 | 2025-08-15 | Initial Release, Basic Features |
 
 ---
 
@@ -120,12 +120,12 @@ Starting with v1.0.0, all new messages are encrypted by default. Existing messag
 
 ## Recognition
 
-Special thanks to all contributors who made these releases possible:
+Contributors:
 
-- **Core Team**: Architecture and development
-- **Security Reviewers**: Encryption implementation validation
-- **Beta Testers**: Early feedback and bug reports
-- **Community**: Feature requests and suggestions
+- Core Team: Architecture and development
+- Security Reviewers: Encryption implementation validation
+- Beta Testers: Early feedback and bug reports
+- Community: Feature requests and suggestions
 
 ---
 
