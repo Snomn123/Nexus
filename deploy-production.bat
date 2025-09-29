@@ -33,7 +33,7 @@ if not exist "nginx" mkdir nginx
 if not exist "nginx\ssl" mkdir nginx\ssl
 
 REM Build production images
-echo 🏗️  Building production images...
+echo Building production images...
 docker-compose -f docker-compose.prod.yml build --no-cache
 
 if errorlevel 1 (
@@ -96,14 +96,14 @@ docker-compose -f docker-compose.prod.yml ps
 
 echo.
 echo Next Steps:
-echo 1. 🌐 Set up your domain and SSL certificates
-echo 2. 🔒 Update FRONTEND_URL in .env.production
-echo 3. 📊 Set up monitoring and logging
-echo 4. 💾 Configure automated backups
-echo 5. 🚦 Set up CI/CD pipeline
+echo 1. Set up your domain and SSL certificates
+echo 2. Update FRONTEND_URL in .env.production
+echo 3. Set up monitoring and logging
+echo 4. Configure automated backups
+echo 5. Set up CI/CD pipeline
 
 echo.
-echo 📚 Useful Commands:
+echo Useful Commands:
 echo - View logs: docker-compose -f docker-compose.prod.yml logs -f
 echo - Stop services: docker-compose -f docker-compose.prod.yml down
 echo - Restart services: docker-compose -f docker-compose.prod.yml restart

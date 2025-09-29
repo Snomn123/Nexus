@@ -96,7 +96,7 @@ class MigrationManager {
                 );
                 
                 await db.query('COMMIT');
-                console.log(`✅ Migration completed: ${migration.version}`);
+                console.log(`Migration completed: ${migration.version}`);
                 
             } catch (error) {
                 await db.query('ROLLBACK');
@@ -104,7 +104,7 @@ class MigrationManager {
             }
             
         } catch (error) {
-            console.error(`❌ Migration failed: ${migration.version}`, error);
+            console.error(`Migration failed: ${migration.version}`, error);
             throw error;
         }
     }
@@ -119,20 +119,20 @@ class MigrationManager {
             const pendingMigrations = await this.getPendingMigrations();
             
             if (pendingMigrations.length === 0) {
-                console.log('✅ No pending migrations');
+                console.log('No pending migrations');
                 return;
             }
             
-            console.log(`🔄 Running ${pendingMigrations.length} pending migrations...`);
+            console.log(`Running ${pendingMigrations.length} pending migrations...`);
             
             for (const migration of pendingMigrations) {
                 await this.runMigration(migration);
             }
             
-            console.log('✅ All migrations completed successfully');
+            console.log('All migrations completed successfully');
             
         } catch (error) {
-            console.error('❌ Migration process failed:', error);
+            console.error('Migration process failed:', error);
             throw error;
         }
     }
@@ -157,7 +157,7 @@ class MigrationManager {
             };
             
         } catch (error) {
-            console.error('❌ Failed to get migration status:', error);
+            console.error('Failed to get migration status:', error);
             throw error;
         }
     }
@@ -188,12 +188,12 @@ class MigrationManager {
 `;
             
             await fs.writeFile(filepath, template);
-            console.log(`✅ Created migration: ${filename}`);
+            console.log(`Created migration: ${filename}`);
             
             return filepath;
             
         } catch (error) {
-            console.error('❌ Failed to create migration:', error);
+            console.error('Failed to create migration:', error);
             throw error;
         }
     }
@@ -207,7 +207,7 @@ class MigrationManager {
         } catch (error) {
             // Directory doesn't exist, create it
             await fs.mkdir(this.migrationsDir, { recursive: true });
-            console.log(`✅ Created migrations directory: ${this.migrationsDir}`);
+            console.log(`Created migrations directory: ${this.migrationsDir}`);
         }
     }
 }

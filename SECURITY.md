@@ -4,8 +4,8 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 1.x.x   | ✅ Fully supported |
-| 0.x.x   | ❌ No longer supported |
+| 1.x.x   | Fully supported |
+| 0.x.x   | No longer supported |
 
 ## Security Features
 
@@ -39,7 +39,7 @@ For critical security vulnerabilities, please **DO NOT** create a public GitHub 
 - **Response Time**: Within 24 hours for critical issues
 - **Encryption**: You may encrypt sensitive reports using our PGP key (available upon request)
 
-### 📝 What to Include
+### What to Include
 Please provide the following information:
 
 1. **Description** of the vulnerability

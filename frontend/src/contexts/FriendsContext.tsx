@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Friend, FriendRequest, FriendsContextType, ApiResponse } from '../types';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
+import { Friend, FriendRequest, FriendsContextType } from '../types';
 import { useAuth } from './AuthContext';
 import { friendsAPI } from '../services/api';
 
@@ -18,20 +18,7 @@ export const FriendsProvider: React.FC<FriendsProviderProps> = ({ children }) =>
 
   const { user } = useAuth();
 
-  // Load friends and requests when user logs in
-  useEffect(() => {
-    if (user) {
-      refreshFriends();
-      refreshFriendRequests();
-    } else {
-      // Clear data when user logs out
-      setFriends([]);
-      setFriendRequests([]);
-      setOnlineUsers([]);
-    }
-  }, [user]);
-
-  const refreshFriends = async () => {
+  const refreshFriends = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -47,9 +34,9 @@ export const FriendsProvider: React.FC<FriendsProviderProps> = ({ children }) =>
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  const refreshFriendRequests = async () => {
+  const refreshFriendRequests = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -61,7 +48,20 @@ export const FriendsProvider: React.FC<FriendsProviderProps> = ({ children }) =>
       console.error('Error loading friend requests:', err);
       setError(err.response?.data?.message || 'Failed to load friend requests');
     }
-  };
+  }, [user]);
+
+  // Load friends and requests when user logs in
+  useEffect(() => {
+    if (user) {
+      refreshFriends();
+      refreshFriendRequests();
+    } else {
+      // Clear data when user logs out
+      setFriends([]);
+      setFriendRequests([]);
+      setOnlineUsers([]);
+    }
+  }, [user, refreshFriends, refreshFriendRequests]);
 
   const sendFriendRequest = async (username: string) => {
     try {

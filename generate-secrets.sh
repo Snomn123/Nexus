@@ -2,7 +2,7 @@
 # Production Security Setup Script
 # Run this script to generate secure secrets and prepare for production
 
-echo "🔒 Nexus Production Security Setup"
+echo "Nexus Production Security Setup"
 echo "=================================="
 
 # Generate strong JWT secrets

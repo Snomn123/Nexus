@@ -6,7 +6,7 @@
 echo "Validating Nexus project setup..."
 
 # Check required files
-echo "📁 Checking required files..."
+echo "Checking required files..."
 
 required_files=(
     "README.md"
@@ -32,7 +32,7 @@ done
 if [[ ${#missing_files[@]} -eq 0 ]]; then
     echo "All required files present"
 else
-    echo "❌ Missing files:"
+    echo "Missing files:"
     for file in "${missing_files[@]}"; do
         echo "   - $file"
     done
@@ -44,11 +44,11 @@ if [[ -d "backend/src/migrations" ]]; then
     migration_count=$(find backend/src/migrations -name "*.sql" | wc -l)
     echo "Found $migration_count migration files"
 else
-    echo "❌ Migrations directory not found"
+    echo "Migrations directory not found"
 fi
 
 # Check if schema.sql contains required tables  
-echo "📊 Validating database schema..."
+echo "Validating database schema..."
 if [[ -f "backend/schema.sql" ]]; then
     required_tables=("users" "servers" "channels" "messages" "direct_messages")
     missing_tables=()
@@ -68,7 +68,7 @@ if [[ -f "backend/schema.sql" ]]; then
         done
     fi
 else
-    echo "❌ Database schema file not found"
+    echo "Database schema file not found"
 fi
 
 # Check package.json files have required scripts
@@ -93,17 +93,17 @@ if [[ -f "frontend/package.json" ]]; then
 fi
 
 # Check Docker configuration
-echo "🐳 Checking Docker configuration..."
+echo "Checking Docker configuration..."
 if [[ -f "docker-compose.yml" ]]; then
     if grep -q "postgres" docker-compose.yml && grep -q "redis" docker-compose.yml; then
-        echo "✅ Docker services configured"
+        echo "Docker services configured"
     else
-        echo "⚠️  Docker services incomplete"
+        echo "Docker services incomplete"
     fi
 fi
 
 echo ""
-echo "🎯 Validation complete!"
+echo "Validation complete!"
 echo ""
 echo "To test the full setup:"
 echo "1. Run: docker-compose up -d postgres redis"

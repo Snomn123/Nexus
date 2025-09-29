@@ -2,7 +2,7 @@
 REM Production Security Setup Script for Windows
 REM Run this script to generate secure secrets and prepare for production
 
-echo 🔒 Nexus Production Security Setup
+echo Nexus Production Security Setup
 echo ==================================
 
 echo.
@@ -11,11 +11,11 @@ node -e "console.log('JWT_SECRET=' + require('crypto').randomBytes(64).toString(
 node -e "console.log('JWT_REFRESH_SECRET=' + require('crypto').randomBytes(64).toString('hex'))"
 
 echo.
-echo 📋 2. Generate Database Password:
+echo 2. Generate Database Password:
 node -e "console.log('DB_PASSWORD=' + require('crypto').randomBytes(32).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 20))"
 
 echo.
-echo 📋 3. Generate Redis Password:
+echo 3. Generate Redis Password:
 node -e "console.log('REDIS_PASSWORD=' + require('crypto').randomBytes(32).toString('base64').replace(/[^a-zA-Z0-9]/g, '').substring(0, 20))"
 
 echo.
