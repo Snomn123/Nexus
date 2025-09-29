@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main, production ]
 
+permissions:
+  contents: read
+
 env:
   NODE_VERSION: '18'
   
@@ -146,6 +149,10 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     
     steps:
     - name: Checkout Repository
