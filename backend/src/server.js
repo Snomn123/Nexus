@@ -29,7 +29,10 @@ const allowedOrigins = [
     "http://localhost:3000",
     "http://192.168.1.85:3000",
     "https://snomn123.github.io",
-    "https://snomn123.github.io/Nexus"
+    "https://snomn123.github.io/Nexus",
+    "https://snomn123.github.io/Nexus/",
+    // Add wildcard for GitHub Pages subpaths
+    /^https:\/\/snomn123\.github\.io(\/.*)?$/
 ];
 
 const io = socketIo(server, {
