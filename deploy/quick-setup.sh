@@ -73,6 +73,7 @@ print_status "Creating environment configuration..."
 cat > .env.production << EOF
 NODE_ENV=production
 PORT=5000
+FRONTEND_URL=https://snomn123.github.io
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=nexus

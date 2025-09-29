@@ -341,6 +341,37 @@ cd backend && npm install && npm run migrate
 cd ../frontend && npm install && npm start
 ```
 
+## Deployment
+
+### Production Deployment (Oracle Cloud + GitHub Pages)
+
+**Live Demo**: [https://snomn123.github.io/Nexus/](https://snomn123.github.io/Nexus/)
+
+#### Current Production Setup:
+- **Frontend**: GitHub Pages (Free)
+- **Backend**: Oracle Cloud Free Tier (132.145.59.91)
+- **Database**: PostgreSQL on Oracle Cloud
+- **Total Cost**: $0/month
+
+#### Quick Setup:
+```bash
+# 1. Setup environments for production
+./scripts/setup-environments.sh production
+
+# 2. Deploy backend to Oracle Cloud
+ssh -i your-key.pem ubuntu@132.145.59.91
+wget -O - https://raw.githubusercontent.com/Snomn123/Nexus/production/deploy/quick-setup.sh | bash
+
+# 3. Frontend deploys automatically via GitHub Actions
+```
+
+#### Manual Configuration:
+- **Backend**: Add GitHub Pages to CORS origins
+- **Frontend**: Point to Oracle Cloud API (132.145.59.91)
+- **GitHub Actions**: Builds and deploys frontend automatically
+
+See `SIMPLE-ORACLE-SETUP.md` for detailed deployment instructions.
+
 ## Contributing
 
 1. Fork the repository

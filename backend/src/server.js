@@ -24,7 +24,9 @@ const server = http.createServer(app);
 const allowedOrigins = [
     process.env.FRONTEND_URL || "http://localhost:3000",
     "http://localhost:3000",
-    "http://192.168.1.85:3000"
+    "http://192.168.1.85:3000",
+    "https://snomn123.github.io",
+    "https://snomn123.github.io/Nexus"
 ];
 
 const io = socketIo(server, {
