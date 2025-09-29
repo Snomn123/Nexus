@@ -8,6 +8,8 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 env:
   NODE_VERSION: '18'
@@ -43,6 +45,16 @@ jobs:
       run: |
         cd frontend
         npm run build
+      env:
+        CI: false
+        PUBLIC_URL: /${{ github.event.repository.name }}
+        
+    - name: Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend/build/
+        retention-days: 1
         
     - name: Run Frontend Tests
       run: |
@@ -274,17 +286,21 @@ jobs:
     
     environment:
       name: production
-      url: ${{ vars.PRODUCTION_URL || 'https://nexus-production.app' }}
+      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
       
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      
-    - name: Deploy to Production
-      run: |
-        echo "Deploying to production..."
-        echo "This would trigger your deployment process"
-        # Add your deployment commands here
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend-build
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: frontend-build
+        cname: ${{ vars.CUSTOM_DOMAIN }}
         
     - name: Notify Deployment
       uses: 8398a7/action-slack@v3
