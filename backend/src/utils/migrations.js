@@ -27,9 +27,9 @@ class MigrationManager {
                 )
             `);
             
-            console.log('✅ Migrations table initialized');
+            console.log('Migrations table initialized');
         } catch (error) {
-            console.error('❌ Failed to initialize migrations table:', error);
+            console.error('Failed to initialize migrations table:', error);
             throw error;
         }
     }
@@ -66,7 +66,7 @@ class MigrationManager {
 
             return pendingMigrations;
         } catch (error) {
-            console.error('❌ Failed to get pending migrations:', error);
+            console.error('Failed to get pending migrations:', error);
             throw error;
         }
     }
@@ -76,7 +76,7 @@ class MigrationManager {
      */
     async runMigration(migration) {
         try {
-            console.log(`🔄 Running migration: ${migration.version}`);
+            console.log(`Running migration: ${migration.version}`);
             
             // Read migration file
             const sql = await fs.readFile(migration.path, 'utf8');

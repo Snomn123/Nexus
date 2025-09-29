@@ -12,19 +12,19 @@ class SocketHandler {
     }
 
     setupMiddleware() {
-        console.log('🔧 Socket.IO authentication enabled');
+        console.log('Socket.IO authentication enabled');
         
         // Log all connection attempts
         this.io.engine.on('connection', (socket) => {
-            console.log('🔗 Engine connection received from:', socket.request.connection.remoteAddress);
-            console.log('🔗 Engine connection transport:', socket.transport.name);
+            console.log('Engine connection received from:', socket.request.connection.remoteAddress);
+            console.log('Engine connection transport:', socket.transport.name);
         });
         
         this.io.use(async (socket, next) => {
             try {
-                console.log('🔌 Socket.IO middleware: connection attempt received');
-                console.log('🔌 Socket ID:', socket.id);
-                console.log('🔌 Socket handshake:', {
+                console.log('Socket.IO middleware: connection attempt received');
+                console.log('Socket ID:', socket.id);
+                console.log('Socket handshake:', {
                     address: socket.handshake.address,
                     headers: socket.handshake.headers['user-agent'],
                     query: socket.handshake.query,
@@ -45,7 +45,7 @@ class SocketHandler {
                 console.log('🔍 Extracted token:', token ? 'Token found' : 'No token found');
                 
                 if (!token) {
-                    console.log('❌ No authentication token found in cookies');
+                    console.log('No authentication token found in cookies');
                     return next(new Error('Authentication required'));
                 }
                 
@@ -56,23 +56,23 @@ class SocketHandler {
                 // Get user from database - handle both userId and id field names
                 const userId = decoded.userId || decoded.id;
                 if (!userId) {
-                    console.log('❌ No user ID found in JWT token');
+                    console.log('No user ID found in JWT token');
                     return next(new Error('Invalid token - no user ID'));
                 }
                 
                 const userResult = await db.query('SELECT * FROM users WHERE id = $1', [userId]);
                 
                 if (userResult.rows.length === 0) {
-                    console.log('❌ User not found in database:', decoded.id);
+                    console.log('User not found in database:', decoded.id);
                     return next(new Error('User not found'));
                 }
                 
                 socket.user = userResult.rows[0];
-                console.log('✅ Socket.IO user authenticated:', socket.user.username);
+                console.log('Socket.IO user authenticated:', socket.user.username);
                 next();
                 
             } catch (error) {
-                console.error('❌ Socket.IO authentication error:', error.message);
+                console.error('Socket.IO authentication error:', error.message);
                 next(new Error('Authentication failed'));
             }
         });
@@ -88,8 +88,8 @@ class SocketHandler {
         const userId = socket.user.id;
         const username = socket.user.username;
 
-        console.log(`🎉 User ${username} SUCCESSFULLY connected with socket ${socket.id}`);
-        console.log(`🎉 Total connected users: ${this.connectedUsers.size + 1}`);
+        console.log(`User ${username} successfully connected with socket ${socket.id}`);
+        console.log(`Total connected users: ${this.connectedUsers.size + 1}`);
 
         // Store user connection
         this.connectedUsers.set(userId, socket.id);

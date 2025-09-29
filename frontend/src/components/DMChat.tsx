@@ -61,9 +61,9 @@ const DMChat: React.FC = () => {
         }
       }, 10);
       
-      console.log('✅ Message sent successfully');
+      console.log('Message sent successfully');
     } catch (error) {
-      console.error('❌ Failed to send message:', error);
+      console.error('Failed to send message:', error);
     } finally {
       setSending(false);
     }

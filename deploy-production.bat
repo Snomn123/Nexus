@@ -1,5 +1,5 @@
 @echo off
-REM Nexus Production Deployment Script for Windows
+REM Nexus Production Depecho Building production images...oyment Script for Windows
 REM This script sets up and deploys Nexus in production mode
 
 echo Nexus Production Deployment
@@ -7,7 +7,7 @@ echo ==============================
 
 REM Check if .env.production exists
 if not exist ".env.production" (
-    echo ❌ Error: .env.production file not found!
+    echo Error: .env.production file not found!
     echo Please create .env.production with your production secrets.
     echo Run 'npm run generate-secrets' to generate secure secrets.
     pause
@@ -17,14 +17,14 @@ if not exist ".env.production" (
 REM Check if Docker is running
 docker info >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Error: Docker is not running!
-    echo 🐳 Please start Docker Desktop and try again.
+    echo Error: Docker is not running!
+    echo Please start Docker Desktop and try again.
     pause
     exit /b 1
 )
 
 REM Create data directories
-echo 📁 Creating data directories...
+echo Creating data directories...
 if not exist "data" mkdir data
 if not exist "data\postgres" mkdir data\postgres
 if not exist "data\redis" mkdir data\redis
@@ -37,23 +37,23 @@ echo 🏗️  Building production images...
 docker-compose -f docker-compose.prod.yml build --no-cache
 
 if errorlevel 1 (
-    echo ❌ Error: Failed to build production images!
+    echo Error: Failed to build production images!
     pause
     exit /b 1
 )
 
 REM Start production services
-echo 🐳 Starting production services...
+echo Starting production services...
 docker-compose -f docker-compose.prod.yml up -d
 
 if errorlevel 1 (
-    echo ❌ Error: Failed to start production services!
+    echo Error: Failed to start production services!
     pause
     exit /b 1
 )
 
 REM Wait for services to be ready
-echo ⏳ Waiting for services to start...
+echo Waiting for services to start...
 timeout /t 30 /nobreak >nul
 
 REM Test application endpoints
@@ -88,10 +88,10 @@ echo.
 echo DEPLOYMENT SUCCESSFUL!
 echo ========================
 echo Application URL: http://localhost
-echo 🔧 API URL: http://localhost/api
-echo 🏥 Health Check: http://localhost/health
+echo API URL: http://localhost/api
+echo Health Check: http://localhost/health
 echo.
-echo 📊 Container Status:
+echo Container Status:
 docker-compose -f docker-compose.prod.yml ps
 
 echo.

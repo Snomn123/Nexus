@@ -40,18 +40,18 @@ const io = socketIo(server, {
 
 // Add Socket.IO engine debug logging
 io.engine.on('initial_headers', (headers, req) => {
-    console.log('🔧 Socket.IO initial headers from:', req.url);
+    console.log('Socket.IO initial headers from:', req.url);
 });
 
 io.engine.on('connection_error', (err) => {
-    console.error('❌ Socket.IO engine connection error:', err);
+    console.error('Socket.IO engine connection error:', err);
 });
 
 io.on('connect_error', (err) => {
-    console.error('❌ Socket.IO connect error:', err);
+    console.error('Socket.IO connect error:', err);
 });
 
-console.log('🚀 Socket.IO server initialized with CORS origin:', process.env.FRONTEND_URL || "http://localhost:3000");
+console.log('Socket.IO server initialized with CORS origin:', process.env.FRONTEND_URL || "http://localhost:3000");
 
 // Middleware
 app.use(helmet({

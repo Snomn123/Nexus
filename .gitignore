@@ -158,3 +158,6 @@ CHANGELOG.md
 NETWORK_ACCESS_GUIDE.md
 security-audit.md
 improvements-summary.md
+
+# Scripts
+commit-push-all.bat

@@ -33,7 +33,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Note: Encryption session will need to be restored when user provides password
         // This happens during login. For existing sessions, we can't restore encryption
         // without the user's password due to security requirements.
-        console.log('ℹ️ User authenticated - encryption will be available after next login');
+        console.log('User authenticated - encryption will be available after next login');
       }
     } catch (error: any) {
       // User is not authenticated, clear any existing state
@@ -60,12 +60,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Initialize encryption service with user credentials
         try {
           await encryptionService.initializeEncryption(userData.id, password);
-          console.log('✅ Encryption initialized successfully');
+          console.log('Encryption initialized successfully');
           
           // Store current user ID for DM encryption
           localStorage.setItem('currentUserId', String(userData.id));
         } catch (encryptionError) {
-          console.error('❌ Failed to initialize encryption:', encryptionError);
+          console.error('Failed to initialize encryption:', encryptionError);
           // Don't fail login if encryption initialization fails
         }
       }

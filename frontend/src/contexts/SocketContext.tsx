@@ -38,11 +38,11 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         timeout: 10000, // 10 second timeout
       };
       
-      console.log('🔧 Socket options:', socketOptions);
+      console.log('Socket options:', socketOptions);
       const newSocket = io(socketUrl, socketOptions);
       
-      console.log('🔄 Socket.IO instance created:', newSocket);
-      console.log('🔌 Initial socket state:', {
+      console.log('Socket.IO instance created:', newSocket);
+      console.log('Initial socket state:', {
         connected: newSocket.connected,
         disconnected: newSocket.disconnected,
         id: newSocket.id
@@ -53,7 +53,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       
       // Monitor connection status
       const checkConnection = () => {
-        console.log('🔄 Connection status check:', {
+        console.log('Connection status check:', {
           connected: newSocket.connected,
           disconnected: newSocket.disconnected,
           id: newSocket.id,
@@ -68,7 +68,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       // Force connection if it doesn't auto-connect
       setTimeout(() => {
         if (!newSocket.connected) {
-          console.log('🔄 Forcing Socket.IO connection after 1 second...');
+          console.log('Forcing Socket.IO connection after 1 second...');
           newSocket.connect();
         }
       }, 1000);
@@ -76,7 +76,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       // Additional force after 3 seconds
       setTimeout(() => {
         if (!newSocket.connected) {
-          console.log('🔄 Forcing Socket.IO connection again after 3 seconds...');
+          console.log('Forcing Socket.IO connection again after 3 seconds...');
           newSocket.disconnect();
           newSocket.connect();
         }
@@ -84,26 +84,26 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
       // Connection event handlers
       newSocket.on('connect', () => {
-        console.log('✅ Socket.IO Connected! ID:', newSocket.id);
+        console.log('Socket.IO Connected! ID:', newSocket.id);
         setConnected(true);
       });
 
       newSocket.on('disconnect', (reason) => {
-        console.log('❌ Socket.IO Disconnected. Reason:', reason);
+        console.log('Socket.IO Disconnected. Reason:', reason);
         setConnected(false);
       });
       
       newSocket.on('connecting', () => {
-        console.log('🔄 Socket.IO Connecting...');
+        console.log('Socket.IO Connecting...');
       });
       
       newSocket.on('reconnect', (attemptNumber) => {
-        console.log('🔄 Socket.IO Reconnected after', attemptNumber, 'attempts');
+        console.log('Socket.IO Reconnected after', attemptNumber, 'attempts');
         setConnected(true);
       });
       
       newSocket.on('reconnecting', (attemptNumber) => {
-        console.log('🔄 Socket.IO Reconnecting... Attempt:', attemptNumber);
+        console.log('Socket.IO Reconnecting... Attempt:', attemptNumber);
       });
 
       // Message event handlers
@@ -152,7 +152,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
       // Error handling
       newSocket.on('connect_error', (error: any) => {
-        console.error('❌ Socket.IO Connection Error:', error);
+        console.error('Socket.IO Connection Error:', error);
         console.error('Error details:', {
           message: error.message,
           description: error.description,
@@ -163,16 +163,16 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       });
       
       newSocket.on('error', (error: any) => {
-        console.error('⚠️ Socket.IO Error:', error);
+        console.error('Socket.IO Error:', error);
         setConnected(false);
       });
       
       newSocket.on('reconnect_error', (error: any) => {
-        console.error('🔄 Socket.IO Reconnect Error:', error);
+        console.error('Socket.IO Reconnect Error:', error);
       });
       
       newSocket.on('reconnect_failed', () => {
-        console.error('❌ Socket.IO Reconnect Failed - giving up');
+        console.error('Socket.IO Reconnect Failed - giving up');
         setConnected(false);
       });
 
@@ -183,7 +183,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
       };
     } else if (!user && socketRef.current) {
       // User logged out, close socket
-      console.log('❌ User logged out, closing Socket.IO connection');
+      console.log('User logged out, closing Socket.IO connection');
       socketRef.current.close();
       socketRef.current = null;
       setSocket(null);
