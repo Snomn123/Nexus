@@ -283,10 +283,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [frontend-test, backend-test, security-scan, docker-build, integration-test]
     if: github.ref == 'refs/heads/production' && github.event_name == 'push'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     
     environment:
-      name: production
-      url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
       
     steps:
     - name: Download Build Artifacts
@@ -295,12 +299,17 @@ jobs:
         name: frontend-build
         path: frontend-build
         
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload to GitHub Pages
+      uses: actions/upload-pages-artifact@v3
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: frontend-build
-        cname: ${{ vars.CUSTOM_DOMAIN }}
+        path: 'frontend-build'
+        
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
         
     - name: Notify Deployment
       uses: 8398a7/action-slack@v3
