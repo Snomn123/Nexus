@@ -158,12 +158,12 @@ jobs:
     - name: Run Security Audit (Frontend)
       run: |
         cd frontend
-        npm audit --audit-level moderate
+        npm audit --audit-level high
         
     - name: Run Security Audit (Backend)
       run: |
         cd backend
-        npm audit --audit-level moderate
+        npm audit --audit-level high
         
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v2
