@@ -294,4 +294,4 @@ jobs:
         text: 'Nexus has been deployed to production'
       env:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-      if: always()
+      if: always() && secrets.SLACK_WEBHOOK != ''
