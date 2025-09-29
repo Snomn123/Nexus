@@ -158,6 +158,10 @@ CHANGELOG.md
 NETWORK_ACCESS_GUIDE.md
 security-audit.md
 improvements-summary.md
+SIMPLE-ORACLE-SETUP.md
 
 # Scripts
 commit-push-all.bat
+
+# Deploy
+#deploy/quick-setup.sh
