@@ -1,5 +1,8 @@
 // Basic functionality tests for CI pipeline
 
+// Export to make this file a module for TypeScript
+export {};
+
 // Basic arithmetic test
 test('basic math works', () => {
   expect(2 + 2).toBe(4);
