@@ -274,7 +274,7 @@ jobs:
     
     environment:
       name: production
-      url: https://nexus.example.com
+      url: ${{ vars.PRODUCTION_URL || 'https://nexus-production.app' }}
       
     steps:
     - name: Checkout Repository
