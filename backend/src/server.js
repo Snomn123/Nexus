@@ -23,16 +23,12 @@ const server = http.createServer(app);
 // Trust proxy for nginx reverse proxy
 app.set('trust proxy', true);
 
-// Socket.IO setup with CORS
+// Socket.IO setup with CORS for local development
 const allowedOrigins = [
     process.env.FRONTEND_URL || "http://localhost:3000",
-    "http://localhost:3000",
-    "http://192.168.1.85:3000",
-    "https://snomn123.github.io",
-    "https://snomn123.github.io/Nexus",
-    "https://snomn123.github.io/Nexus/",
-    // Add wildcard for GitHub Pages subpaths
-    /^https:\/\/snomn123\.github\.io(\/.*)?$/
+    // Docker network origins
+    "http://frontend:3000",
+    "http://localhost:8080"
 ];
 
 const io = socketIo(server, {

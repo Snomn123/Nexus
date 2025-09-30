@@ -2,14 +2,12 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, production, develop ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main, production ]
+    branches: [ main ]
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 env:
   NODE_VERSION: '18'
@@ -48,9 +46,9 @@ jobs:
       env:
         CI: false
         PUBLIC_URL: /${{ github.event.repository.name }}
-        REACT_APP_API_URL: https://api.smdtic.me/api
-        REACT_APP_SOCKET_URL: https://api.smdtic.me
-        REACT_APP_ENV: production
+        REACT_APP_API_URL: http://localhost:5000/api
+        REACT_APP_SOCKET_URL: http://localhost:5000
+        REACT_APP_ENV: development
         
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v4
@@ -280,118 +278,3 @@ jobs:
         JWT_SECRET: test-secret
         JWT_REFRESH_SECRET: test-refresh-secret
 
-  # Deployment (Production only)
-  deploy:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [frontend-test, backend-test, security-scan, docker-build, integration-test]
-    if: github.ref == 'refs/heads/production' && github.event_name == 'push'
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-      
-    steps:
-    - name: Download Build Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: frontend-build
-        path: frontend-build
-        
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-      with:
-        enablement: true
-      
-    - name: Upload to GitHub Pages
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: 'frontend-build'
-        
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
-        
-    - name: Notify Deployment Success
-      if: success()
-      run: |
-        curl -H "Content-Type: application/json" \
-        -d "{
-          \"embeds\": [{
-            \"title\": \"🟢 Deployment Successful\",
-            \"description\": \"Nexus has been successfully deployed to production!\",
-            \"color\": 65280,
-            \"fields\": [
-              {\"name\": \"Repository\", \"value\": \"${{ github.repository }}\", \"inline\": true},
-              {\"name\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true},
-              {\"name\": \"Commit\", \"value\": \"[\`${{ github.sha }}\`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\", \"inline\": true},
-              {\"name\": \"Deployed URL\", \"value\": \"${{ steps.deployment.outputs.page_url }}\", \"inline\": false}
-            ],
-            \"timestamp\": \"${{ github.event.head_commit.timestamp }}\"
-          }]
-        }" \
-        https://discord.com/api/webhooks/1422292122379489382/-byv4FZD8pHsIt5VXx9Fb-4UTa49ck_5BmTkD4f6gENJ90xlFKsNf34RpM3EGC5IT_GL
-        
-    - name: Notify Deployment Failure
-      if: failure()
-      run: |
-        curl -H "Content-Type: application/json" \
-        -d "{
-          \"embeds\": [{
-            \"title\": \"🔴 Deployment Failed\",
-            \"description\": \"Nexus deployment to production has failed.\",
-            \"color\": 16711680,
-            \"fields\": [
-              {\"name\": \"Repository\", \"value\": \"${{ github.repository }}\", \"inline\": true},
-              {\"name\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true},
-              {\"name\": \"Commit\", \"value\": \"[\`${{ github.sha }}\`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\", \"inline\": true},
-              {\"name\": \"Workflow Run\", \"value\": \"[View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\", \"inline\": false}
-            ],
-            \"timestamp\": \"${{ github.event.head_commit.timestamp }}\"
-          }]
-        }" \
-        https://discord.com/api/webhooks/1422292122379489382/-byv4FZD8pHsIt5VXx9Fb-4UTa49ck_5BmTkD4f6gENJ90xlFKsNf34RpM3EGC5IT_GL
-
-  # Discord Notifications for CI/CD Status
-  notify:
-    name: CI/CD Status Notification
-    runs-on: ubuntu-latest
-    needs: [frontend-test, backend-test, security-scan, docker-build, integration-test, deploy]
-    if: always() && (failure() || cancelled())
-    
-    steps:
-    - name: Notify CI/CD Failure
-      run: |
-        # Determine which jobs failed
-        FAILED_JOBS=""
-        [[ "${{ needs.frontend-test.result }}" == "failure" ]] && FAILED_JOBS="$FAILED_JOBS Frontend Tests,"
-        [[ "${{ needs.backend-test.result }}" == "failure" ]] && FAILED_JOBS="$FAILED_JOBS Backend Tests,"
-        [[ "${{ needs.security-scan.result }}" == "failure" ]] && FAILED_JOBS="$FAILED_JOBS Security Scan,"
-        [[ "${{ needs.docker-build.result }}" == "failure" ]] && FAILED_JOBS="$FAILED_JOBS Docker Build,"
-        [[ "${{ needs.integration-test.result }}" == "failure" ]] && FAILED_JOBS="$FAILED_JOBS Integration Tests,"
-        [[ "${{ needs.deploy.result }}" == "failure" ]] && FAILED_JOBS="$FAILED_JOBS Deployment,"
-        
-        # Remove trailing comma
-        FAILED_JOBS=${FAILED_JOBS%,}
-        
-        curl -H "Content-Type: application/json" \
-        -d "{
-          \"embeds\": [{
-            \"title\": \"🟡 CI/CD Pipeline Failed\",
-            \"description\": \"The Nexus CI/CD pipeline has encountered failures.\",
-            \"color\": 16776960,
-            \"fields\": [
-              {\"name\": \"Repository\", \"value\": \"${{ github.repository }}\", \"inline\": true},
-              {\"name\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"inline\": true},
-              {\"name\": \"Commit\", \"value\": \"[\`${{ github.sha }}\`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\", \"inline\": true},
-              {\"name\": \"Failed Jobs\", \"value\": \"${FAILED_JOBS:-Unknown}\", \"inline\": false},
-              {\"name\": \"Workflow Run\", \"value\": \"[View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\", \"inline\": false}
-            ],
-            \"timestamp\": \"${{ github.event.head_commit.timestamp }}\"
-          }]
-        }" \
-        https://discord.com/api/webhooks/1422292122379489382/-byv4FZD8pHsIt5VXx9Fb-4UTa49ck_5BmTkD4f6gENJ90xlFKsNf34RpM3EGC5IT_GL

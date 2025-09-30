@@ -1,6 +1,6 @@
 # Nexus
 
-[![Production Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)](https://github.com/Snomn123/Nexus)
+[![Development Status](https://img.shields.io/badge/Status-Development-blue)](https://github.com/Snomn123/Nexus)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)](https://www.typescriptlang.org/)
@@ -343,34 +343,31 @@ cd ../frontend && npm install && npm start
 
 ## Deployment
 
-### Production Deployment (Oracle Cloud + GitHub Pages)
+### Local Development (Docker Compose)
 
-**Live Demo**: [https://snomn123.github.io/Nexus/](https://snomn123.github.io/Nexus/)
-
-#### Current Production Setup:
-- **Frontend**: GitHub Pages (Free)
-- **Backend**: Oracle Cloud Free Tier (132.145.59.91)
-- **Database**: PostgreSQL on Oracle Cloud
-- **Total Cost**: $0/month
+#### Development Setup:
+- **Frontend**: React dev server (http://localhost:3000)
+- **Backend**: Node.js Express (http://localhost:5000)
+- **Database**: PostgreSQL via Docker
+- **Redis**: Redis via Docker
 
 #### Quick Setup:
 ```bash
-# 1. Setup environments for production
-./scripts/setup-environments.sh production
+# 1. Clone and start services
+git clone https://github.com/Snomn123/Nexus.git
+cd Nexus
+docker-compose up -d
 
-# 2. Deploy backend to Oracle Cloud
-ssh -i your-key.pem ubuntu@132.145.59.91
-wget -O - https://raw.githubusercontent.com/Snomn123/Nexus/production/deploy/quick-setup.sh | bash
-
-# 3. Frontend deploys automatically via GitHub Actions
+# 2. Access application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:5000/api
 ```
 
-#### Manual Configuration:
-- **Backend**: Add GitHub Pages to CORS origins
-- **Frontend**: Point to Oracle Cloud API (132.145.59.91)
-- **GitHub Actions**: Builds and deploys frontend automatically
-
-See `SIMPLE-ORACLE-SETUP.md` for detailed deployment instructions.
+#### Docker Services:
+- **Backend**: Node.js Express server on port 5000
+- **Frontend**: React development server on port 3000  
+- **PostgreSQL**: Database on port 5432
+- **Redis**: Cache server on port 6379
 
 ## Contributing
 
