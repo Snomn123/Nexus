@@ -33,13 +33,13 @@
 .dm-item {
   display: flex;
   align-items: center;
-  padding: 10px 12px;
+  padding: 8px 12px;
   margin: 2px 8px;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.15s ease;
   position: relative;
-  min-height: 52px;
+  min-height: 36px;
 }
 
 .dm-item:hover {
@@ -101,7 +101,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2px;
+  margin-bottom: 1px;
 }
 
 .dm-username {
@@ -123,6 +123,11 @@
 .dm-preview {
   display: flex;
   align-items: center;
+  height: 24px !important;
+  max-height: 24px;
+  min-height: 24px;
+  overflow: hidden;
+  line-height: 1;
 }
 
 .last-message {
@@ -132,12 +137,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.2;
+  height: 24px;
 }
 
 .no-messages {
   font-size: 13px;
   color: #64748b;
   font-style: italic;
+  line-height: 1.2;
+  height: 24px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block;
+  max-height: 24px;
 }
 
 .unread-badge {

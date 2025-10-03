@@ -20,8 +20,20 @@ const dmRoutes = require('./routes/dm');
 const app = express();
 const server = http.createServer(app);
 
-// Trust proxy for nginx reverse proxy
-app.set('trust proxy', true);
+// Configure trust proxy setting based on environment
+// In Docker: trust proxy from Docker bridge network
+// In production with reverse proxy: trust specific proxy IPs
+if (process.env.NODE_ENV === 'production' && process.env.TRUST_PROXY) {
+    // Production: trust specific proxy IPs (comma-separated)
+    const proxyIPs = process.env.TRUST_PROXY.split(',').map(ip => ip.trim());
+    app.set('trust proxy', proxyIPs);
+} else if (process.env.NODE_ENV === 'development' && process.env.DOCKER) {
+    // Docker development: trust Docker bridge network
+    app.set('trust proxy', ['172.16.0.0/12', '192.168.0.0/16', '10.0.0.0/8']);
+} else {
+    // Local development: no proxy
+    app.set('trust proxy', false);
+}
 
 // Socket.IO setup with CORS for local development
 const allowedOrigins = [

@@ -8,71 +8,71 @@ const dmController = {
     try {
       const userId = req.user.id;
       
-      // Simple query to get all unique conversation partners
-      const query = `
-        SELECT DISTINCT
-          conversation_id as id,
+      // Get all friends (including those without messages)
+      const friendsQuery = `
+        SELECT 
           CASE 
-            WHEN sender_id = $1 THEN receiver_id
-            ELSE sender_id
-          END as participant_id
-        FROM direct_messages 
-        WHERE sender_id = $1 OR receiver_id = $1
+            WHEN user1_id = $1 THEN user2_id
+            ELSE user1_id
+          END as friend_id
+        FROM friendships 
+        WHERE user1_id = $1 OR user2_id = $1
       `;
       
-      const result = await db.query(query, [userId]);
-      
+      const friendsResult = await db.query(friendsQuery, [userId]);
       const conversations = [];
       
-      // For each conversation, get the details
-      for (const row of result.rows) {
-        const participantId = row.participant_id;
-        const conversationId = row.id;
+      // For each friend, create a conversation (with or without messages)
+      for (const row of friendsResult.rows) {
+        const friendId = row.friend_id;
         
-        // Get participant info
-        const participantQuery = `
+        // Get friend info
+        const friendQuery = `
           SELECT username, avatar_url, status 
           FROM users 
           WHERE id = $1
         `;
-        const participantResult = await db.query(participantQuery, [participantId]);
+        const friendResult = await db.query(friendQuery, [friendId]);
         
-        if (participantResult.rows.length === 0) continue;
+        if (friendResult.rows.length === 0) continue;
         
-        const participant = participantResult.rows[0];
+        const friend = friendResult.rows[0];
         
-        // Get last message
+        // Generate conversation ID (consistent for the same pair of users)
+        const conversationId = `dm_${Math.min(userId, friendId)}_${Math.max(userId, friendId)}`;
+        
+        // Get last message if any exists
         const lastMessageQuery = `
           SELECT content, sender_id, created_at
           FROM direct_messages
-          WHERE conversation_id = $1
+          WHERE (sender_id = $1 AND receiver_id = $2) OR (sender_id = $2 AND receiver_id = $1)
           ORDER BY created_at DESC
           LIMIT 1
         `;
-        const lastMessageResult = await db.query(lastMessageQuery, [conversationId]);
+        const lastMessageResult = await db.query(lastMessageQuery, [userId, friendId]);
         
         // Get unread count
         const unreadQuery = `
           SELECT COUNT(*) as count
           FROM direct_messages
-          WHERE conversation_id = $1 AND receiver_id = $2 AND read = false
+          WHERE sender_id = $1 AND receiver_id = $2 AND read = false
         `;
-        const unreadResult = await db.query(unreadQuery, [conversationId, userId]);
+        const unreadResult = await db.query(unreadQuery, [friendId, userId]);
         
         const lastMessage = lastMessageResult.rows[0];
         const unreadCount = parseInt(unreadResult.rows[0].count);
         
         conversations.push({
           id: conversationId,
-          participant_id: participantId,
-          participant_username: participant.username,
-          participant_avatar_url: participant.avatar_url,
-          participant_status: participant.status || 'offline',
+          participant_id: friendId,
+          participant_username: friend.username,
+          participant_avatar_url: friend.avatar_url,
+          participant_status: friend.status || 'offline',
           last_message: lastMessage ? {
             id: null,
             content: lastMessage.content,
             sender_id: lastMessage.sender_id,
-            sender_username: lastMessage.sender_id === userId ? 'You' : participant.username,
+            sender_username: lastMessage.sender_id === userId ? 'You' : friend.username,
             created_at: lastMessage.created_at
           } : null,
           unread_count: unreadCount,
@@ -102,14 +102,40 @@ const dmController = {
       const offset = parseInt(req.query.offset) || 0;
 
       // Verify user has access to this conversation
+      // First check if there are existing messages where user is involved
       const accessQuery = `
         SELECT COUNT(*) as count FROM direct_messages 
         WHERE conversation_id = $1 AND (sender_id = $2 OR receiver_id = $2)
       `;
       const accessResult = await db.query(accessQuery, [conversationId, userId]);
       
+      // If no messages exist, check if this is a valid conversation between friends
       if (parseInt(accessResult.rows[0].count) === 0) {
-        return res.status(403).json({ message: 'Access denied to this conversation' });
+        // Extract user IDs from conversation_id format: dm_userId1_userId2
+        const conversationMatch = conversationId.match(/^dm_(\d+)_(\d+)$/);
+        if (!conversationMatch) {
+          return res.status(403).json({ message: 'Invalid conversation format' });
+        }
+        
+        const [, user1Id, user2Id] = conversationMatch;
+        const participant1 = parseInt(user1Id);
+        const participant2 = parseInt(user2Id);
+        
+        // Verify the current user is one of the participants
+        if (userId !== participant1 && userId !== participant2) {
+          return res.status(403).json({ message: 'Access denied to this conversation' });
+        }
+        
+        // Verify the users are friends
+        const friendshipQuery = `
+          SELECT COUNT(*) as count FROM friendships 
+          WHERE (user1_id = $1 AND user2_id = $2) OR (user1_id = $2 AND user2_id = $1)
+        `;
+        const friendshipResult = await db.query(friendshipQuery, [participant1, participant2]);
+        
+        if (parseInt(friendshipResult.rows[0].count) === 0) {
+          return res.status(403).json({ message: 'Access denied to this conversation' });
+        }
       }
 
       const query = `

@@ -118,11 +118,12 @@ const DMList: React.FC<DMListProps> = ({ onSwitchToDMs }) => {
             <span className="dm-username">
               {conversation.participant_username}
             </span>
-            {conversation.last_message && (
-              <span className="dm-timestamp">
-                {formatTime(conversation.last_message.created_at)}
-              </span>
-            )}
+            <span className="dm-timestamp">
+              {conversation.last_message 
+                ? formatTime(conversation.last_message.created_at)
+                : 'New'
+              }
+            </span>
           </div>
           
           <div className="dm-preview">

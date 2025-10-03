@@ -115,17 +115,29 @@ const login = async (req, res) => {
         }
 
         const { password } = req.body;
-        const email = sanitizeEmail(req.body.email);
+        const emailOrUsername = req.body.emailOrUsername?.trim();
         
-        if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
+        if (!emailOrUsername || !password) {
+            return res.status(400).json({ error: 'Email/username and password are required' });
         }
 
-        // Find user
-        const userResult = await db.query(
-            'SELECT id, username, email, password_hash FROM users WHERE email = $1',
-            [email]
-        );
+        // Determine if input is email or username
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailOrUsername);
+        
+        let userResult;
+        if (isEmail) {
+            const email = sanitizeEmail(emailOrUsername);
+            userResult = await db.query(
+                'SELECT id, username, email, password_hash FROM users WHERE email = $1',
+                [email]
+            );
+        } else {
+            const username = emailOrUsername;
+            userResult = await db.query(
+                'SELECT id, username, email, password_hash FROM users WHERE username = $1',
+                [username]
+            );
+        }
 
         if (userResult.rows.length === 0) {
             return res.status(401).json({ error: 'Invalid credentials' });
@@ -270,10 +282,11 @@ const registerValidation = [
 ];
 
 const loginValidation = [
-    body('email')
-        .isEmail()
-        .normalizeEmail()
-        .withMessage('Please provide a valid email'),
+    body('emailOrUsername')
+        .notEmpty()
+        .withMessage('Email or username is required')
+        .isLength({ min: 3 })
+        .withMessage('Email or username must be at least 3 characters'),
     body('password')
         .notEmpty()
         .withMessage('Password is required')

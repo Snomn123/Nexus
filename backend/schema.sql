@@ -58,7 +58,11 @@ CREATE TABLE IF NOT EXISTS messages (
     reply_to INTEGER REFERENCES messages(id) ON DELETE SET NULL,
     edited BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- Encryption support
+    encrypted_content TEXT,
+    is_encrypted BOOLEAN DEFAULT FALSE,
+    encryption_version VARCHAR(10)
 );
 
 -- Direct messages table
@@ -72,7 +76,11 @@ CREATE TABLE IF NOT EXISTS direct_messages (
     edited BOOLEAN DEFAULT FALSE,
     read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- Encryption support
+    encrypted_content TEXT,
+    is_encrypted BOOLEAN DEFAULT FALSE,
+    encryption_version VARCHAR(10)
 );
 
 -- Friendships table (accepted friendships)
@@ -152,6 +160,10 @@ BEGIN
     -- NOTE: Removed triggers for messages & direct_messages (too frequent, causes performance issues)
 END
 $$;
+
+-- Performance indexes for encryption fields
+CREATE INDEX IF NOT EXISTS idx_messages_encrypted ON messages(is_encrypted);
+CREATE INDEX IF NOT EXISTS idx_direct_messages_encrypted ON direct_messages(is_encrypted);
 
 -- Record all migration versions as executed (for fresh installs)
 INSERT INTO schema_migrations (version, name) VALUES 

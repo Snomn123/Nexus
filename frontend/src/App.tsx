@@ -156,7 +156,7 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
     }
   };
 
-  const loadChannelMessages = async (channelId: number) => {
+  const loadChannelMessages = useCallback(async (channelId: number) => {
     try {
       setMessagesLoading(true);
       const response = await messageAPI.getChannelMessages(channelId) as any;
@@ -170,7 +170,7 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
     } finally {
       setMessagesLoading(false);
     }
-  };
+  }, []);
 
   const handleLogout = useCallback(async () => {
     await logout();

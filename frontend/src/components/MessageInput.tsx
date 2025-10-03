@@ -15,6 +15,7 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
   const [isTyping, setIsTyping] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const prevChannelIdRef = useRef<number>(channelId);
   
   const { sendMessage, startTyping, stopTyping, connected } = useSocket();
 
@@ -73,7 +74,7 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
       clearTimeout(typingTimeoutRef.current);
       typingTimeoutRef.current = null;
     }
-  }, [isTyping, channelId, stopTyping]);
+  }, [isTyping, stopTyping]); // Removed channelId dependency
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -88,15 +89,20 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
       if (typingTimeoutRef.current) {
         clearTimeout(typingTimeoutRef.current);
       }
-      handleStopTyping();
+      if (isTyping) {
+        stopTyping(channelId);
+      }
     };
-  }, [handleStopTyping]);
+  }, []); // Empty dependency array for cleanup only
 
   // Stop typing when channel changes
   useEffect(() => {
-    handleStopTyping();
-    setMessage('');
-  }, [channelId, handleStopTyping]);
+    if (prevChannelIdRef.current !== channelId) {
+      handleStopTyping();
+      setMessage('');
+      prevChannelIdRef.current = channelId;
+    }
+  }, [channelId]);
 
   // Focus input when component mounts
   useEffect(() => {
@@ -141,7 +147,8 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
           <div className="flex-1">
             <input
               ref={(el) => {
-                inputRef.current = el;
+                // Use type assertion to work around React 18/19 TypeScript strictness
+                (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = el;
                 if (typeof ref === 'function') {
                   ref(el);
                 } else if (ref) {

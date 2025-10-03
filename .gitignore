@@ -48,6 +48,9 @@ backup_*.sql
 # Logs
 logs
 *.log
+
+# Internal documentation and planning files
+internal-docs-guide.md
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

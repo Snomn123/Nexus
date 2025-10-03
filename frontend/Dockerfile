@@ -13,8 +13,8 @@ RUN npm ci
 COPY . .
 
 # Set environment variables for build
-ENV REACT_APP_API_URL=http://192.168.1.85:5000/api
-ENV REACT_APP_SOCKET_URL=http://192.168.1.85:5000
+ENV REACT_APP_API_URL=http://localhost:5000/api
+ENV REACT_APP_SOCKET_URL=http://localhost:5000
 
 # Build the app
 RUN npm run build

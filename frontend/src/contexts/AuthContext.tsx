@@ -46,12 +46,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = async (emailOrUsername: string, password: string): Promise<void> => {
     try {
       setError('');
       setLoading(true);
       
-      const response = await authAPI.login({ email, password }) as any;
+      const response = await authAPI.login({ emailOrUsername, password }) as any;
       
       if (response && (response.user || response.data?.user)) {
         const userData = response.user || response.data?.user;

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useRef, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback, ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { soundManager } from '../utils/sounds';
@@ -194,21 +194,21 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     }
   }, [user, socket]);
 
-  const joinChannel = (channelId: number) => {
+  const joinChannel = useCallback((channelId: number) => {
     if (socket && connected) {
       socket.emit('join_channel', { channelId });
       console.log('Joining channel:', channelId);
     }
-  };
+  }, [socket, connected]);
 
-  const leaveChannel = (channelId: number) => {
+  const leaveChannel = useCallback((channelId: number) => {
     if (socket && connected) {
       socket.emit('leave_channel', { channelId });
       console.log('Leaving channel:', channelId);
     }
-  };
+  }, [socket, connected]);
 
-  const sendMessage = (channelId: number, content: string, replyTo?: number) => {
+  const sendMessage = useCallback((channelId: number, content: string, replyTo?: number) => {
     if (socket && connected) {
       socket.emit('send_message', {
         channelId,
@@ -216,23 +216,23 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         replyTo
       });
     }
-  };
+  }, [socket, connected]);
 
-  const startTyping = (channelId: number) => {
+  const startTyping = useCallback((channelId: number) => {
     if (socket && connected) {
       socket.emit('typing_start', { channelId });
     }
-  };
+  }, [socket, connected]);
 
-  const stopTyping = (channelId: number) => {
+  const stopTyping = useCallback((channelId: number) => {
     if (socket && connected) {
       socket.emit('typing_stop', { channelId });
     }
-  };
+  }, [socket, connected]);
 
-  const clearMessages = () => {
+  const clearMessages = useCallback(() => {
     setMessages([]);
-  };
+  }, []);
 
   const value: SocketContextType = {
     socket,

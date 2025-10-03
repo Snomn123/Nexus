@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { LoginFormData } from '../types';
 
 interface LoginFormProps {
-  onLogin: (email: string, password: string) => Promise<void>;
+  onLogin: (emailOrUsername: string, password: string) => Promise<void>;
   loading?: boolean;
   error?: string;
   onSwitchToRegister: () => void;
@@ -10,14 +10,14 @@ interface LoginFormProps {
 
 export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading, error, onSwitchToRegister }) => {
   const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
+    emailOrUsername: '',
     password: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await onLogin(formData.email, formData.password);
+      await onLogin(formData.emailOrUsername, formData.password);
     } catch (err) {
       // Error handling is done by parent component
     }
@@ -52,18 +52,18 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLogin, loading, error, o
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-xs font-bold text-gray-300 uppercase mb-2">
-                Email
+              <label htmlFor="emailOrUsername" className="block text-xs font-bold text-gray-300 uppercase mb-2">
+                Email or Username
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="emailOrUsername"
+                name="emailOrUsername"
+                type="text"
                 required
-                value={formData.email}
+                value={formData.emailOrUsername}
                 onChange={handleChange}
                 className="w-full px-4 py-3 bg-nexus-darker border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-nexus-primary focus:border-transparent transition-all"
-                placeholder="Enter your email"
+                placeholder="Enter your email or username"
               />
             </div>
             <div>

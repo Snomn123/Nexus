@@ -5,6 +5,10 @@
   background: rgba(26, 26, 46, 0.95);
   backdrop-filter: blur(10px);
   color: #dcddde;
+  border-radius: 12px;
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
 }
 
 .friends-header {
@@ -70,6 +74,8 @@
   flex: 1;
   overflow-y: auto;
   padding: 20px;
+  user-select: none;
+  cursor: default;
 }
 
 .friends-content h3 {
@@ -79,6 +85,8 @@
   color: #8e9297;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  user-select: none;
+  cursor: default;
 }
 
 .friend-item,
@@ -89,6 +97,8 @@
   border-bottom: 1px solid #2f3136;
   transition: all 0.2s ease;
   min-height: 56px;
+  user-select: none;
+  cursor: default;
 }
 
 .friend-item:hover,
@@ -182,22 +192,24 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* Generic hover for action buttons (will be overridden by more specific selectors) */
 .action-btn:hover {
   background: linear-gradient(135deg, #6366f1, #4f46e5);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
-.accept-btn:hover {
-  background-color: #3ba55c;
+/* Specific hover effects override the generic one - use background instead of background-color */
+.action-btn.accept-btn:hover {
+  background: #3ba55c;
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(59, 165, 92, 0.3);
 }
 
-/* Also used for cancel buttons */
-.decline-btn:hover,
-.remove-btn:hover {
-  background-color: #f04747;
+/* Also used for cancel buttons - higher specificity to override .action-btn:hover */
+.action-btn.decline-btn:hover,
+.action-btn.remove-btn:hover {
+  background: #f04747;
   transform: translateY(-1px);
   box-shadow: 0 2px 6px rgba(240, 71, 71, 0.3);
 }

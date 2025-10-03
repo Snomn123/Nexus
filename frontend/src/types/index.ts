@@ -74,7 +74,7 @@ export interface ApiResponse<T = any> {
 }
 
 export interface LoginRequest {
-  email: string;
+  emailOrUsername: string;
   password: string;
 }
 
@@ -204,7 +204,7 @@ export interface AuthContextType {
   user: User | null;
   loading: boolean;
   error: string;
-  login: (email: string, password: string) => Promise<void>;
+  login: (emailOrUsername: string, password: string) => Promise<void>;
   register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -286,7 +286,7 @@ export interface UserListProps {
 
 // Form types
 export interface LoginFormData {
-  email: string;
+  emailOrUsername: string;
   password: string;
 }
 

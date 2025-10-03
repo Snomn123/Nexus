@@ -43,7 +43,7 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "@types/node": "^24.5.2",
+    "@types/node": "^20.11.30",
     "nodemon": "^3.1.10"
   },
   "engines": {
