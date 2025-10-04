@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useFriends } from '../contexts/FriendsContext';
-import { useDM } from '../contexts/DMContext';
-import { useAuth } from '../contexts/AuthContext';
-import { Friend, FriendRequest } from '../types';
-import { getAvatarColor } from '../utils/avatarColors';
+import { useFriends } from '../../contexts/FriendsContext';
+import { useDM } from '../../contexts/DMContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { Friend, FriendRequest } from '../../types';
+import { getAvatarColor } from '../../utils/avatarColors';
 import './FriendsList.css';
 
 type FriendsTab = 'online' | 'all' | 'pending' | 'add';

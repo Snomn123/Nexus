@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS channels (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Messages table
+-- Messages table (MANDATORY ENCRYPTION)
 CREATE TABLE IF NOT EXISTS messages (
     id SERIAL PRIMARY KEY,
     content TEXT NOT NULL CHECK (char_length(content) <= 2000 AND char_length(trim(content)) > 0),
@@ -59,13 +59,13 @@ CREATE TABLE IF NOT EXISTS messages (
     edited BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- Encryption support
-    encrypted_content TEXT,
-    is_encrypted BOOLEAN DEFAULT FALSE,
-    encryption_version VARCHAR(10)
+    -- MANDATORY ENCRYPTION FIELDS
+    encrypted_content TEXT NOT NULL, -- Always required for new messages
+    is_encrypted BOOLEAN DEFAULT TRUE NOT NULL, -- Default to encrypted
+    encryption_version VARCHAR(10) NOT NULL DEFAULT '1'
 );
 
--- Direct messages table
+-- Direct messages table (MANDATORY ENCRYPTION)
 CREATE TABLE IF NOT EXISTS direct_messages (
     id SERIAL PRIMARY KEY,
     content TEXT NOT NULL,
@@ -77,10 +77,10 @@ CREATE TABLE IF NOT EXISTS direct_messages (
     read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    -- Encryption support
-    encrypted_content TEXT,
-    is_encrypted BOOLEAN DEFAULT FALSE,
-    encryption_version VARCHAR(10)
+    -- MANDATORY ENCRYPTION FIELDS
+    encrypted_content TEXT NOT NULL, -- Always required for new DMs
+    is_encrypted BOOLEAN DEFAULT TRUE NOT NULL, -- Default to encrypted
+    encryption_version VARCHAR(10) NOT NULL DEFAULT '1'
 );
 
 -- Friendships table (accepted friendships)
@@ -165,10 +165,31 @@ $$;
 CREATE INDEX IF NOT EXISTS idx_messages_encrypted ON messages(is_encrypted);
 CREATE INDEX IF NOT EXISTS idx_direct_messages_encrypted ON direct_messages(is_encrypted);
 
+-- SECURITY CONSTRAINTS: Enforce mandatory encryption
+ALTER TABLE messages ADD CONSTRAINT IF NOT EXISTS messages_must_be_encrypted 
+    CHECK (is_encrypted = TRUE AND encrypted_content IS NOT NULL AND encryption_version IS NOT NULL);
+
+ALTER TABLE direct_messages ADD CONSTRAINT IF NOT EXISTS direct_messages_must_be_encrypted 
+    CHECK (is_encrypted = TRUE AND encrypted_content IS NOT NULL AND encryption_version IS NOT NULL);
+
+-- Security documentation
+COMMENT ON TABLE messages IS 'All messages are encrypted end-to-end. Server cannot decrypt content.';
+COMMENT ON COLUMN messages.content IS 'Placeholder text (always "[ENCRYPTED]") - real content in encrypted_content';
+COMMENT ON COLUMN messages.encrypted_content IS 'AES-256-CBC encrypted message content - only client can decrypt';
+COMMENT ON COLUMN messages.is_encrypted IS 'MUST be TRUE - system enforces mandatory encryption';
+COMMENT ON COLUMN messages.encryption_version IS 'Encryption version for future algorithm updates';
+
+COMMENT ON TABLE direct_messages IS 'All direct messages are encrypted end-to-end. Server cannot decrypt content.';
+COMMENT ON COLUMN direct_messages.content IS 'Placeholder text (always "[ENCRYPTED]") - real content in encrypted_content';
+COMMENT ON COLUMN direct_messages.encrypted_content IS 'AES-256-CBC encrypted DM content - only participants can decrypt';
+COMMENT ON COLUMN direct_messages.is_encrypted IS 'MUST be TRUE - system enforces mandatory encryption';
+COMMENT ON COLUMN direct_messages.encryption_version IS 'Encryption version for future algorithm updates';
+
 -- Record all migration versions as executed (for fresh installs)
 INSERT INTO schema_migrations (version, name) VALUES 
     ('20250920_000001_initial_schema', 'initial schema'),
     ('20250924_000001_add_is_public_to_servers', 'add is public to servers'),
     ('20250924_000002_clear_existing_servers', 'clear existing servers'),
-    ('20250924_000003_cleanup_unused_features', 'cleanup unused features')
+    ('20250924_000003_cleanup_unused_features', 'cleanup unused features'),
+    ('20251004_000001_enforce_encryption', 'mandatory encryption enforcement')
 ON CONFLICT (version) DO NOTHING;

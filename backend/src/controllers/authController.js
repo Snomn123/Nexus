@@ -4,6 +4,10 @@ const db = require('../config/database');
 const { generateTokens, verifyRefreshToken } = require('../middleware/auth');
 const { sanitizeUsername, sanitizeEmail } = require('../utils/security');
 
+// SECURITY NOTE: Passwords arrive pre-hashed from client (SHA-256)
+// Server applies bcrypt to the client hash for double protection
+// This prevents plain-text password transmission
+
 const register = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -38,7 +42,8 @@ const register = async (req, res) => {
             return res.status(400).json({ error: 'User already exists' });
         }
 
-        // Hash password
+        // Hash the client-side hashed password (double protection)
+        // Client sends SHA-256 hash, server bcrypts it for storage
         const saltRounds = 12;
         const passwordHash = await bcrypt.hash(password, saltRounds);
 
@@ -145,7 +150,8 @@ const login = async (req, res) => {
 
         const user = userResult.rows[0];
 
-        // Check password
+        // Check password (password comes pre-hashed from client for security)
+        // Server bcrypts the client hash for double protection
         const isValidPassword = await bcrypt.compare(password, user.password_hash);
         if (!isValidPassword) {
             return res.status(401).json({ error: 'Invalid credentials' });

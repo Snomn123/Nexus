@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Server, User } from '../types';
-import { serverAPI } from '../services/api';
+import { Server, User } from '../../types';
+import { serverAPI } from '../../services/api';
 
 interface ServerSettingsModalProps {
   server: Server;

@@ -21,4 +21,7 @@ router.post('/conversations/:conversationId/read', dmController.markAsRead);
 // Send a direct message
 router.post('/send', dmController.sendDirectMessage);
 
+// Delete a direct message
+router.delete('/messages/:messageId', dmController.deleteDirectMessage);
+
 module.exports = router;

@@ -1,14 +1,18 @@
 import React, { useState, useRef, useEffect, forwardRef, useCallback } from 'react';
-import { useSocket } from '../contexts/SocketContext';
+import { useSocket } from '../../contexts/SocketContext';
+
+import { Message } from '../../types';
 
 interface MessageInputProps {
   channelId: number;
   channelName: string;
   disabled?: boolean;
+  replyingTo?: Message | null;
+  onCancelReply?: () => void;
 }
 
 export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
-  { channelId, channelName, disabled = false },
+  { channelId, channelName, disabled = false, replyingTo, onCancelReply },
   ref
 ) => {
   const [message, setMessage] = useState('');
@@ -22,11 +26,12 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
   const handleSubmit = () => {
     if (!message.trim() || !connected || disabled) return;
     
-    // Send the message
-    sendMessage(channelId, message.trim());
+    // Send the message with optional reply
+    sendMessage(channelId, message.trim(), replyingTo?.id);
     
-    // Clear input
+    // Clear input and reply
     setMessage('');
+    onCancelReply?.();
     
     // Keep focus on the input after sending
     setTimeout(() => {
@@ -80,6 +85,9 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSubmit();
+    } else if (e.key === 'Escape' && replyingTo) {
+      e.preventDefault();
+      onCancelReply?.();
     }
   };
 
@@ -100,16 +108,17 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
     if (prevChannelIdRef.current !== channelId) {
       handleStopTyping();
       setMessage('');
+      onCancelReply?.(); // Clear any active reply
       prevChannelIdRef.current = channelId;
     }
-  }, [channelId]);
+  }, [channelId, onCancelReply]);
 
-  // Focus input when component mounts
+  // Focus input when component mounts or when starting a reply
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [channelId]);
+  }, [channelId, replyingTo]);
 
   const isInputDisabled = disabled || !connected;
 
@@ -121,6 +130,33 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
         backgroundColor: '#40444b'
       }}
     >
+      {/* Reply Preview */}
+      {replyingTo && (
+        <div className="mb-2 px-4 py-2 bg-gray-700 bg-opacity-50 rounded-t-lg border-l-4 border-indigo-500">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 text-sm">
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+              </svg>
+              <span className="text-gray-300">Replying to</span>
+              <span className="text-indigo-400 font-medium">{replyingTo.username}</span>
+            </div>
+            <button
+              onClick={onCancelReply}
+              className="text-gray-400 hover:text-white transition-colors"
+              type="button"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+          <div className="text-xs text-gray-400 mt-1 truncate" style={{ maxWidth: '400px' }}>
+            {replyingTo.content}
+          </div>
+        </div>
+      )}
+      
       <div className="relative">
         <div className="flex items-center rounded-lg" 
           style={{ 
@@ -159,7 +195,7 @@ export const MessageInput = forwardRef<HTMLInputElement, MessageInputProps>((
               value={message}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder={`Message #${channelName}`}
+              placeholder={replyingTo ? `Reply to ${replyingTo.username}...` : `Message #${channelName}`}
               disabled={isInputDisabled}
               maxLength={4000}
               className="w-full bg-transparent border-0 outline-0 px-0 py-0"

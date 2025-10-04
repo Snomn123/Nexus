@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Server } from '../types';
-import { serverAPI } from '../services/api';
-import { getAvatarColor } from '../utils/avatarColors';
+import { Server } from '../../types';
+import { serverAPI } from '../../services/api';
+import { getAvatarColor } from '../../utils/avatarColors';
 import './ServerBrowser.css';
 
 interface ServerBrowserProps {

@@ -3,19 +3,16 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SocketProvider, useSocket } from './contexts/SocketContext';
 import { FriendsProvider } from './contexts/FriendsContext';
 import { DMProvider } from './contexts/DMContext';
-import { LoginForm } from './components/LoginForm';
-import { RegisterForm } from './components/RegisterForm';
-import { MessageList } from './components/MessageList';
-import { MessageInput } from './components/MessageInput';
-import FriendsList from './components/FriendsList';
-import DMList from './components/DMList';
-import DMChat from './components/DMChat';
-import ServerBrowser from './components/ServerBrowser';
-import ServerSettingsModal from './components/ServerSettingsModal';
+import { LoginForm, RegisterForm } from './components/auth';
+import { MessageList, MessageInput, DMList, DMChat } from './components/legacy';
+import { FriendsList } from './components/friends';
+import { ServerBrowser, ServerSettingsModal } from './components/server';
+import EncryptionStatus from './components/EncryptionStatus';
+import SecurityNotice from './components/shared/SecurityNotice';
 import { serverAPI, messageAPI } from './services/api';
 import { Server, Channel, Message } from './types';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
-import ServerListItem from './components/ServerListItem';
+import { ServerListItem } from './components/server';
 import './App.css';
 
 type AuthMode = 'login' | 'register';
@@ -59,6 +56,7 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
   const [showServerBrowser, setShowServerBrowser] = useState(false);
   const [showUserSettings, setShowUserSettings] = useState(false);
   const [showServerSettings, setShowServerSettings] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const messageInputRef = useRef<HTMLInputElement>(null);
   
   const { user, logout } = useAuth();
@@ -122,6 +120,9 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
       joinChannel(activeChannel.id);
       loadChannelMessages(activeChannel.id);
     }
+    
+    // Clear reply when switching channels
+    setReplyingTo(null);
     
     return () => {
       clearMessages();
@@ -198,6 +199,27 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
   const handleChannelSelect = useCallback((channel: Channel) => {
     setActiveChannel(channel);
   }, []);
+
+  // Handle reply functionality
+  const handleReply = useCallback((message: Message) => {
+    setReplyingTo(message);
+    // Focus input after setting reply
+    setTimeout(() => {
+      messageInputRef.current?.focus();
+    }, 50);
+  }, []);
+
+  const handleCancelReply = useCallback(() => {
+    setReplyingTo(null);
+  }, []);
+
+  const handleMessageDeleted = useCallback((messageId: number) => {
+    setChannelMessages(prev => prev.filter(msg => msg.id !== messageId));
+    // Also clear reply if replying to deleted message
+    if (replyingTo && replyingTo.id === messageId) {
+      setReplyingTo(null);
+    }
+  }, [replyingTo]);
 
   // Memoized computations for performance
   const sortedServers = useMemo(() => {
@@ -496,6 +518,8 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
               channelId={activeChannel.id}
               messages={channelMessages}
               loading={messagesLoading}
+              onReply={handleReply}
+              onMessageDeleted={handleMessageDeleted}
             />
             
             {/* Message Input */}
@@ -503,6 +527,8 @@ const NexusInterface: React.FC<NexusInterfaceProps> = ({ currentView, onViewChan
               ref={messageInputRef}
               channelId={activeChannel.id}
               channelName={activeChannel.name}
+              replyingTo={replyingTo}
+              onCancelReply={handleCancelReply}
             />
           </>
         )}

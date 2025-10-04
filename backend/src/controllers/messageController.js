@@ -99,20 +99,27 @@ const sendMessage = async (req, res) => {
             }
         }
 
-        // Handle encryption fields
+        // ENFORCE ENCRYPTION - All messages must be encrypted
         const { encrypted_content, is_encrypted, encryption_version } = req.body;
         
-        // Create message with optional encryption fields
-        let query, values;
-        if (is_encrypted && encrypted_content) {
-            query = `INSERT INTO messages 
-                     (content, user_id, channel_id, reply_to, encrypted_content, is_encrypted, encryption_version) 
-                     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
-            values = [content, userId, channelId, replyTo || null, encrypted_content, is_encrypted, encryption_version];
-        } else {
-            query = 'INSERT INTO messages (content, user_id, channel_id, reply_to) VALUES ($1, $2, $3, $4) RETURNING *';
-            values = [content, userId, channelId, replyTo || null];
+        // Validate encryption requirements
+        if (!is_encrypted || !encrypted_content || !encryption_version) {
+            return res.status(400).json({ 
+                error: 'SECURITY REQUIREMENT: All messages must be encrypted. Missing encryption fields.' 
+            });
         }
+        
+        if (content !== '[ENCRYPTED]') {
+            return res.status(400).json({ 
+                error: 'SECURITY VIOLATION: Message content must be placeholder for encrypted messages.' 
+            });
+        }
+        
+        // Create encrypted message - encryption is MANDATORY
+        const query = `INSERT INTO messages 
+                      (content, user_id, channel_id, reply_to, encrypted_content, is_encrypted, encryption_version) 
+                      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+        const values = [content, userId, channelId, replyTo || null, encrypted_content, is_encrypted, encryption_version];
         
         const newMessage = await db.query(query, values);
 
@@ -170,20 +177,27 @@ const editMessage = async (req, res) => {
             return res.status(403).json({ error: 'You can only edit your own messages' });
         }
 
-        // Handle encryption fields for edit
+        // ENFORCE ENCRYPTION for message editing
         const { encrypted_content, is_encrypted, encryption_version } = req.body;
         
-        // Update message with optional encryption fields
-        let query, values;
-        if (is_encrypted && encrypted_content) {
-            query = `UPDATE messages 
-                     SET content = $1, edited = true, encrypted_content = $2, is_encrypted = $3, encryption_version = $4 
-                     WHERE id = $5 RETURNING *`;
-            values = [content, encrypted_content, is_encrypted, encryption_version, messageId];
-        } else {
-            query = 'UPDATE messages SET content = $1, edited = true WHERE id = $2 RETURNING *';
-            values = [content, messageId];
+        // Validate encryption requirements for edits
+        if (!is_encrypted || !encrypted_content || !encryption_version) {
+            return res.status(400).json({ 
+                error: 'SECURITY REQUIREMENT: All message edits must be encrypted. Missing encryption fields.' 
+            });
         }
+        
+        if (content !== '[ENCRYPTED]') {
+            return res.status(400).json({ 
+                error: 'SECURITY VIOLATION: Message content must be placeholder for encrypted messages.' 
+            });
+        }
+        
+        // Update with encrypted content - encryption is MANDATORY
+        const query = `UPDATE messages 
+                      SET content = $1, edited = true, encrypted_content = $2, is_encrypted = $3, encryption_version = $4 
+                      WHERE id = $5 RETURNING *`;
+        const values = [content, encrypted_content, is_encrypted, encryption_version, messageId];
         
         const updatedMessage = await db.query(query, values);
 
@@ -240,6 +254,16 @@ const deleteMessage = async (req, res) => {
 
         // Delete message
         await db.query('DELETE FROM messages WHERE id = $1', [messageId]);
+
+        // Emit socket event to notify other users in the channel
+        const io = req.app.get('io');
+        if (io) {
+            io.to(`channel_${message.channel_id}`).emit('message_deleted', {
+                messageId: parseInt(messageId),
+                channelId: message.channel_id,
+                deletedBy: userId
+            });
+        }
 
         res.json({ message: 'Message deleted successfully' });
     } catch (error) {

@@ -178,6 +178,7 @@ export interface DirectMessage {
   conversation_id: string;
   reply_to?: number;
   reply_to_content?: string;
+  reply_to_username?: string;
   edited: boolean;
   read: boolean;
   created_at: string;

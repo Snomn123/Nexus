@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LoginFormData } from '../types';
+import { LoginFormData } from '../../types';
 
 interface LoginFormProps {
   onLogin: (emailOrUsername: string, password: string) => Promise<void>;

@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Server } from '../types';
+import { Server } from '../../types';
 
 interface ServerListItemProps {
   server: Server;

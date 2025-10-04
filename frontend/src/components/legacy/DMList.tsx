@@ -1,7 +1,7 @@
 import React from 'react';
-import { useDM } from '../contexts/DMContext';
-import { DMConversation } from '../types';
-import { getAvatarColor } from '../utils/avatarColors';
+import { useDM } from '../../contexts/DMContext';
+import { DMConversation } from '../../types';
+import { getAvatarColor } from '../../utils/avatarColors';
 import './DMList.css';
 
 interface DMListProps {

@@ -150,6 +150,17 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
         }));
       });
 
+      // Message deletion
+      newSocket.on('message_deleted', ({ messageId, channelId, deletedBy }: any) => {
+        setMessages(prev => prev.filter(msg => msg.id !== messageId));
+      });
+
+      // DM message deletion
+      newSocket.on('dm_message_deleted', ({ messageId, conversationId, deletedBy }: any) => {
+        // This will be handled by the DM context when it's listening
+        console.log('DM message deleted:', { messageId, conversationId, deletedBy });
+      });
+
       // Error handling
       newSocket.on('connect_error', (error: any) => {
         console.error('Socket.IO Connection Error:', error);

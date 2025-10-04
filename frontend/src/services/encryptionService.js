@@ -13,21 +13,36 @@ class EncryptionService {
 
   /**
    * Initialize encryption with user's master password
-   * Called after successful authentication
+   * Called after successful authentication - MANDATORY for system operation
    */
   async initializeEncryption(userPassword, userId) {
-    // Derive master key from user password + userId (salt)
-    this.userMasterKey = CryptoJS.PBKDF2(userPassword, userId.toString(), {
-      keySize: 256/32,
-      iterations: 100000
-    }).toString();
-    
-    // Store encrypted master key in localStorage for session persistence
-    const encryptedMasterKey = CryptoJS.AES.encrypt(this.userMasterKey, userPassword).toString();
-    localStorage.setItem('nexus_master_key', encryptedMasterKey);
-    localStorage.setItem('nexus_user_id', userId.toString());
-    
-    return this.userMasterKey !== null;
+    if (!userPassword || !userId) {
+      throw new Error('Password and User ID required for encryption initialization');
+    }
+
+    try {
+      // Derive master key from user password + userId (salt)
+      this.userMasterKey = CryptoJS.PBKDF2(userPassword, userId.toString(), {
+        keySize: 256/32,
+        iterations: 100000
+      }).toString();
+      
+      if (!this.userMasterKey || this.userMasterKey.length === 0) {
+        throw new Error('Failed to generate encryption key');
+      }
+      
+      // Store encrypted master key in localStorage for session persistence
+      const encryptedMasterKey = CryptoJS.AES.encrypt(this.userMasterKey, userPassword).toString();
+      localStorage.setItem('nexus_master_key', encryptedMasterKey);
+      localStorage.setItem('nexus_user_id', userId.toString());
+      
+      console.log('✅ E2EE Encryption initialized - All messages will be encrypted');
+      return true;
+    } catch (error) {
+      console.error('❌ Critical encryption initialization failure:', error);
+      this.clearEncryption();
+      return false;
+    }
   }
 
   /**
@@ -76,11 +91,22 @@ class EncryptionService {
 
   /**
    * Encrypt message content before sending to server
+   * MANDATORY: All messages must be encrypted
    */
   encryptMessage(content, channelId) {
+    this.validateEncryption(); // Block if not ready
+    
     try {
+      if (!content || content.trim().length === 0) {
+        throw new Error('Cannot encrypt empty message content');
+      }
+      
       const channelKey = this.getChannelKey(channelId);
       const encrypted = CryptoJS.AES.encrypt(content, channelKey).toString();
+      
+      if (!encrypted || encrypted.length === 0) {
+        throw new Error('Encryption produced empty result');
+      }
       
       return {
         encrypted_content: encrypted,
@@ -88,8 +114,8 @@ class EncryptionService {
         is_encrypted: true
       };
     } catch (error) {
-      console.error('Message encryption failed:', error);
-      throw new Error('Failed to encrypt message');
+      console.error('❌ CRITICAL: Message encryption failed:', error);
+      throw new Error('SECURITY FAILURE: Cannot send unencrypted message - ' + error.message);
     }
   }
 
@@ -113,9 +139,20 @@ class EncryptionService {
 
   /**
    * Encrypt direct message between users
+   * MANDATORY: All DMs must be encrypted
    */
   encryptDirectMessage(content, userId, recipientId) {
+    this.validateEncryption(); // Block if not ready
+    
     try {
+      if (!content || content.trim().length === 0) {
+        throw new Error('Cannot encrypt empty DM content');
+      }
+      
+      if (!userId || !recipientId) {
+        throw new Error('User IDs required for DM encryption');
+      }
+      
       // Create unique key for this user pair
       const userIds = [userId, recipientId].sort();
       const dmKey = CryptoJS.PBKDF2(this.userMasterKey, userIds.join('-'), {
@@ -125,14 +162,18 @@ class EncryptionService {
 
       const encrypted = CryptoJS.AES.encrypt(content, dmKey).toString();
       
+      if (!encrypted || encrypted.length === 0) {
+        throw new Error('DM encryption produced empty result');
+      }
+      
       return {
         encrypted_content: encrypted,
         encryption_version: 1,
         is_encrypted: true
       };
     } catch (error) {
-      console.error('DM encryption failed:', error);
-      throw new Error('Failed to encrypt direct message');
+      console.error('❌ CRITICAL: DM encryption failed:', error);
+      throw new Error('SECURITY FAILURE: Cannot send unencrypted DM - ' + error.message);
     }
   }
 
@@ -171,9 +212,24 @@ class EncryptionService {
 
   /**
    * Check if encryption is properly initialized
+   * CRITICAL: System requires this to be true for all operations
    */
   isEncryptionReady() {
-    return this.userMasterKey !== null;
+    const ready = this.userMasterKey !== null && this.userMasterKey.length > 0;
+    if (!ready) {
+      console.warn('⚠️ Encryption not ready - this will block message operations');
+    }
+    return ready;
+  }
+
+  /**
+   * Validate that encryption is working properly
+   */
+  validateEncryption() {
+    if (!this.isEncryptionReady()) {
+      throw new Error('SECURITY ERROR: Encryption not initialized. Cannot proceed with unencrypted operations.');
+    }
+    return true;
   }
 
   /**

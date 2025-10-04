@@ -149,6 +149,7 @@ const dmController = {
           dm.conversation_id,
           dm.reply_to,
           reply_msg.content as reply_to_content,
+          reply_user.username as reply_to_username,
           dm.edited,
           dm.read,
           dm.created_at,
@@ -159,6 +160,7 @@ const dmController = {
         FROM direct_messages dm
         JOIN users sender ON dm.sender_id = sender.id
         LEFT JOIN direct_messages reply_msg ON dm.reply_to = reply_msg.id
+        LEFT JOIN users reply_user ON reply_msg.sender_id = reply_user.id
         WHERE dm.conversation_id = $1
         ORDER BY dm.created_at DESC
         LIMIT $2 OFFSET $3
@@ -215,29 +217,33 @@ const dmController = {
         finalConversationId = `dm_${user1}_${user2}`;
       }
 
-      // Handle encryption fields
+      // ENFORCE ENCRYPTION - All DMs must be encrypted
       const { encrypted_content, is_encrypted, encryption_version } = req.body;
       
-      let query, values;
-      if (is_encrypted && encrypted_content) {
-        query = `
-          INSERT INTO direct_messages (sender_id, receiver_id, content, conversation_id, reply_to, encrypted_content, is_encrypted, encryption_version)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-          RETURNING *
-        `;
-        values = [senderId, receiver_id, content, finalConversationId, reply_to || null, encrypted_content, is_encrypted, encryption_version];
-      } else {
-        query = `
-          INSERT INTO direct_messages (sender_id, receiver_id, content, conversation_id, reply_to)
-          VALUES ($1, $2, $3, $4, $5)
-          RETURNING *
-        `;
-        values = [senderId, receiver_id, content, finalConversationId, reply_to || null];
+      // Validate encryption requirements
+      if (!is_encrypted || !encrypted_content || !encryption_version) {
+        return res.status(400).json({ 
+          error: 'SECURITY REQUIREMENT: All direct messages must be encrypted. Missing encryption fields.' 
+        });
       }
+      
+      if (content !== '[ENCRYPTED]') {
+        return res.status(400).json({ 
+          error: 'SECURITY VIOLATION: DM content must be placeholder for encrypted messages.' 
+        });
+      }
+      
+      // Create encrypted DM - encryption is MANDATORY
+      const query = `
+        INSERT INTO direct_messages (sender_id, receiver_id, content, conversation_id, reply_to, encrypted_content, is_encrypted, encryption_version)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *
+      `;
+      const values = [senderId, receiver_id, content, finalConversationId, reply_to || null, encrypted_content, is_encrypted, encryption_version];
       
       const result = await db.query(query, values);
 
-      // Get sender info for the response
+      // Get sender info and reply info for the response
       const senderQuery = 'SELECT username, avatar_url FROM users WHERE id = $1';
       const senderResult = await db.query(senderQuery, [senderId]);
       
@@ -246,6 +252,22 @@ const dmController = {
         sender_username: senderResult.rows[0].username,
         sender_avatar_url: senderResult.rows[0].avatar_url
       };
+
+      // If this is a reply, get the reply message info
+      if (reply_to) {
+        const replyQuery = `
+          SELECT dm.content, u.username
+          FROM direct_messages dm
+          JOIN users u ON dm.sender_id = u.id
+          WHERE dm.id = $1
+        `;
+        const replyResult = await db.query(replyQuery, [reply_to]);
+        
+        if (replyResult.rows.length > 0) {
+          message.reply_to_content = replyResult.rows[0].content;
+          message.reply_to_username = replyResult.rows[0].username;
+        }
+      }
 
       // Send socket notification to receiver
       const socketHandler = req.app.get('socketHandler');
@@ -376,6 +398,50 @@ const dmController = {
     } catch (error) {
       console.error('Error starting conversation:', error);
       res.status(500).json({ message: 'Internal server error' });
+    }
+  },
+
+  // Delete a direct message
+  deleteDirectMessage: async (req, res) => {
+    try {
+      const { messageId } = req.params;
+      const userId = req.user.id;
+
+      // Check if message exists and user owns it
+      const messageResult = await db.query(
+        'SELECT id, sender_id, receiver_id, conversation_id FROM direct_messages WHERE id = $1',
+        [messageId]
+      );
+
+      if (messageResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Message not found' });
+      }
+
+      const message = messageResult.rows[0];
+
+      // Check if user can delete (only message sender can delete)
+      if (message.sender_id !== userId) {
+        return res.status(403).json({ error: 'You can only delete your own messages' });
+      }
+
+      // Delete message
+      await db.query('DELETE FROM direct_messages WHERE id = $1', [messageId]);
+
+      // Emit socket event to notify the other user
+      const io = req.app.get('io');
+      if (io) {
+        const receiverId = message.sender_id === userId ? message.receiver_id : message.sender_id;
+        io.to(`user_${receiverId}`).emit('dm_message_deleted', {
+          messageId: parseInt(messageId),
+          conversationId: message.conversation_id,
+          deletedBy: userId
+        });
+      }
+
+      res.json({ message: 'Message deleted successfully' });
+    } catch (error) {
+      console.error('Delete DM error:', error);
+      res.status(500).json({ error: 'Internal server error' });
     }
   }
 };

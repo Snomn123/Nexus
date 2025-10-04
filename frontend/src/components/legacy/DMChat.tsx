@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useDM } from '../contexts/DMContext';
-import { DirectMessage } from '../types';
-import { getAvatarColor, getUsernameColor } from '../utils/avatarColors';
+import { useDM } from '../../contexts/DMContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { DirectMessage } from '../../types';
+import { getAvatarColor, getUsernameColor } from '../../utils/avatarColors';
+import { dmAPI } from '../../services/api';
 import './DMChat.css';
 
 
@@ -11,10 +13,13 @@ const DMChat: React.FC = () => {
     messages, 
     loading, 
     error, 
-    sendDirectMessage 
+    sendDirectMessage,
+    refreshMessages 
   } = useDM();
+  const { user } = useAuth();
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<DirectMessage | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -24,11 +29,13 @@ const DMChat: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Focus input when conversation changes
+  // Focus input when conversation changes and clear reply
   useEffect(() => {
     if (activeConversation && inputRef.current) {
       inputRef.current.focus();
     }
+    // Clear reply when switching conversations
+    setReplyingTo(null);
   }, [activeConversation]);
 
   const scrollToBottom = () => {
@@ -49,8 +56,9 @@ const DMChat: React.FC = () => {
     try {
       setSending(true);
       console.log('📤 Sending message:', messageText);
-      await sendDirectMessage(activeConversation.participant_id, messageText);
+      await sendDirectMessage(activeConversation.participant_id, messageText, replyingTo?.id);
       setNewMessage('');
+      setReplyingTo(null); // Clear reply after sending
       
       // Keep focus on input after sending
       setTimeout(() => {
@@ -67,10 +75,35 @@ const DMChat: React.FC = () => {
     }
   };
 
+  // Handle reply functionality
+  const handleReply = (message: DirectMessage) => {
+    setReplyingTo(message);
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 50);
+  };
+
+  const handleCancelReply = () => {
+    setReplyingTo(null);
+  };
+
+  const handleMessageDeleted = (messageId: number) => {
+    if (activeConversation) {
+      refreshMessages(activeConversation.id);
+    }
+    // Clear reply if replying to deleted message
+    if (replyingTo && replyingTo.id === messageId) {
+      setReplyingTo(null);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSendMessage();
+    } else if (e.key === 'Escape' && replyingTo) {
+      e.preventDefault();
+      handleCancelReply();
     }
   };
 
@@ -122,14 +155,17 @@ const DMChat: React.FC = () => {
   };
 
 
-  const renderMessage = (message: DirectMessage, index: number) => {
-    const prevMessage = index > 0 ? messages[index - 1] : null;
-    const showDate = shouldShowDateSeparator(message, prevMessage);
-    const isGrouped = shouldGroupMessage(message, prevMessage);
-    const showAvatar = !isGrouped;
+  // Message component
+  const DMMessageItem: React.FC<{ 
+    message: DirectMessage; 
+    showAvatar: boolean;
+    showDate: boolean;
+  }> = ({ message, showAvatar, showDate }) => {
+    const [showActions, setShowActions] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     return (
-      <div key={message.id}>
+      <div>
         {showDate && (
           <div className="dm-date-separator">
             <div className="date-line"></div>
@@ -144,8 +180,10 @@ const DMChat: React.FC = () => {
             paddingTop: showAvatar ? '2px' : '1px',
             paddingBottom: showAvatar ? '2px' : '1px',
             marginTop: showAvatar ? '17px' : '0',
-            transition: 'none' // Remove transitions for instant response
+            transition: 'none'
           }}
+          onMouseEnter={() => setShowActions(true)}
+          onMouseLeave={() => setShowActions(false)}
         >
           <div className="flex items-start" style={{ minHeight: '22px' }}>
             {/* Avatar Column */}
@@ -214,6 +252,19 @@ const DMChat: React.FC = () => {
                   )}
                 </div>
               )}
+
+              {/* Reply indicator */}
+              {message.reply_to && (
+                <div className="flex items-center mb-1 text-xs text-gray-400 hover:text-gray-300 cursor-pointer">
+                  <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                  </svg>
+                  <span className="font-medium">{message.reply_to_username || 'Unknown User'}</span>
+                  <span className="ml-1 opacity-75 truncate" style={{ maxWidth: '200px' }}>
+                    {message.reply_to_content || 'Original message'}
+                  </span>
+                </div>
+              )}
               
               <div 
                 className="text-white break-words whitespace-pre-wrap select-text cursor-text"
@@ -231,8 +282,88 @@ const DMChat: React.FC = () => {
             </div>
           </div>
 
+          {/* Message Actions Toolbar */}
+          {showActions && (
+            <div className="absolute top-[-16px] right-4 flex items-center space-x-1 bg-gray-800 border border-gray-600 rounded-md shadow-lg px-2 py-1">
+              {/* Reply Button */}
+              <button
+                onClick={() => handleReply(message)}
+                className="p-1 rounded hover:bg-gray-700 transition-colors"
+                title="Reply"
+              >
+                <svg className="w-4 h-4 text-gray-300 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+              </button>
+              
+              {/* Edit Button (only for message sender) */}
+              {user?.id === message.sender_id && (
+                <button
+                  className="p-1 rounded hover:bg-gray-700 transition-colors"
+                  title="Edit Message"
+                >
+                  <svg className="w-4 h-4 text-gray-300 hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                  </svg>
+                </button>
+              )}
+              
+              {/* More Options */}
+              <button
+                className="p-1 rounded hover:bg-gray-700 transition-colors"
+                title="More"
+              >
+                <svg className="w-4 h-4 text-gray-300 hover:text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                </svg>
+              </button>
+              
+              {/* Delete Button (only for message sender) */}
+              {user?.id === message.sender_id && (
+                <button
+                  onClick={async () => {
+                    if (!isDeleting && window.confirm('Are you sure you want to delete this message?')) {
+                      setIsDeleting(true);
+                      try {
+                        await dmAPI.deleteDirectMessage(message.id);
+                        handleMessageDeleted(message.id);
+                      } catch (error) {
+                        console.error('Error deleting message:', error);
+                        alert('Failed to delete message');
+                      } finally {
+                        setIsDeleting(false);
+                      }
+                    }
+                  }}
+                  disabled={isDeleting}
+                  className="p-1 rounded hover:bg-red-600 transition-colors"
+                  title="Delete Message"
+                >
+                  <svg className="w-4 h-4 text-gray-300 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
+    );
+  };
+
+  const renderMessage = (message: DirectMessage, index: number) => {
+    const prevMessage = index > 0 ? messages[index - 1] : null;
+    const showDate = shouldShowDateSeparator(message, prevMessage);
+    const isGrouped = shouldGroupMessage(message, prevMessage);
+    const showAvatar = !isGrouped;
+
+    return (
+      <DMMessageItem
+        key={message.id}
+        message={message}
+        showAvatar={showAvatar}
+        showDate={showDate}
+      />
     );
   };
 
@@ -329,6 +460,33 @@ const DMChat: React.FC = () => {
         )}
       </div>
 
+      {/* Reply Preview */}
+      {replyingTo && (
+        <div className="px-4 py-2 bg-gray-700 bg-opacity-50 border-l-4 border-indigo-500">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 text-sm">
+              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+              </svg>
+              <span className="text-gray-300">Replying to</span>
+              <span className="text-indigo-400 font-medium">{replyingTo.sender_username}</span>
+            </div>
+            <button
+              onClick={handleCancelReply}
+              className="text-gray-400 hover:text-white transition-colors"
+              type="button"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+          <div className="text-xs text-gray-400 mt-1 truncate" style={{ maxWidth: '400px' }}>
+            {replyingTo.content}
+          </div>
+        </div>
+      )}
+
       {/* Message Input */}
       <div
         style = {{
@@ -370,7 +528,7 @@ const DMChat: React.FC = () => {
                     setNewMessage(e.target.value);
                   }}
                   onKeyDown={handleKeyDown}
-                  placeholder={`Message ${activeConversation.participant_username}`}
+                  placeholder={replyingTo ? `Reply to ${replyingTo.sender_username}...` : `Message ${activeConversation.participant_username}`}
                   disabled={sending}
                   maxLength={4000}
                   className="w-full bg-transparent border-0 outline-0 px-0 py-0"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RegisterFormData } from '../types';
+import { RegisterFormData } from '../../types';
 
 interface RegisterFormProps {
   onRegister: (username: string, email: string, password: string) => Promise<void>;

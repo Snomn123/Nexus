@@ -1,16 +1,34 @@
 # Nexus
 
-A real-time communication platform with end-to-end encryption, built with React, Node.js, and PostgreSQL.
+A **zero-knowledge**, real-time communication platform with **mandatory end-to-end encryption** by default. Built with React, Node.js, and PostgreSQL.
+
+## Security First
+
+**ALL COMMUNICATIONS ARE ENCRYPTED BY DEFAULT** - No optional encryption, no plaintext fallbacks.
+
+- **Zero-Knowledge Architecture**: Server cannot decrypt any messages
+- **Mandatory E2EE**: System refuses unencrypted communications  
+- **Client-Side Encryption**: Messages encrypted before leaving your device
+- **Secure Authentication**: Passwords hashed client-side before transmission
 
 ## Features
 
-- End-to-end encryption for secure messaging
+- **Always-On End-to-End Encryption** for all messaging
 - Real-time communication via WebSockets
-- Direct messages and server channels
+- Unified messaging system with consistent features across server channels and DMs
+- Server communities with channels and member management
 - Friend system with request management
 - Message replies, editing, and deletion
-- User presence indicators
+- User presence indicators (online/offline/away/busy)
 - Responsive web interface
+
+## Architecture
+
+- Component-based architecture organized by feature
+- Unified chat system eliminates code duplication
+- Full TypeScript coverage
+- Real-time synchronization across clients
+- Comprehensive documentation and clear project structure
 
 ## Tech Stack
 
@@ -19,6 +37,56 @@ A real-time communication platform with end-to-end encryption, built with React,
 - Database: PostgreSQL + Redis
 - Encryption: AES-256 with PBKDF2 key derivation
 - Deployment: Docker Compose
+- Architecture: Component-based, feature-organized
+
+## Codebase Structure
+
+The project uses a feature-organized architecture:
+
+```
+frontend/src/
+├── components/            # UI Components (organized by feature)
+│   ├── auth/             # Authentication (login, register)
+│   ├── chat/             # Unified messaging system
+│   ├── server/           # Server management & communities
+│   ├── friends/          # Social features & friends
+│   ├── shared/           # Reusable UI components
+│   └── legacy/           # Components being replaced
+├── contexts/             # React state management
+├── services/             # API calls & external services
+├── types/                # TypeScript definitions
+└── utils/                # Helper functions
+
+backend/src/
+├── controllers/          # Business logic & request handling
+├── routes/               # API route definitions
+├── socket/               # Real-time WebSocket handlers
+├── middleware/           # Authentication & validation
+└── migrations/           # Database schema changes
+```
+
+### Key Benefits
+- Components organized by feature for easy navigation
+- Unified chat system eliminates code duplication
+- Comprehensive TypeScript coverage
+- Extensive documentation for developers
+
+### Documentation
+- [`FRONTEND_ARCHITECTURE.md`](FRONTEND_ARCHITECTURE.md) - Complete structure guide
+- [`DEVELOPER_NAVIGATION.md`](DEVELOPER_NAVIGATION.md) - Development task reference
+- [`UNIFIED_SYSTEM_GUIDE.md`](UNIFIED_SYSTEM_GUIDE.md) - Messaging architecture
+
+## Security Guarantees for New Installations
+
+**When you download and set up Nexus today, you get:**
+
+✅ **Encryption by Default**: All messages automatically encrypted  
+✅ **Zero-Knowledge Database**: Server stores only encrypted content  
+✅ **Secure Authentication**: Passwords protected during transmission  
+✅ **No Plaintext Fallbacks**: System blocks unencrypted communications  
+✅ **Privacy by Design**: Even administrators cannot read your messages  
+
+**Database Schema**: New installations create tables with `is_encrypted = TRUE` by default and enforce encryption constraints.
 
 ## Quick Start
 
@@ -41,6 +109,8 @@ A real-time communication platform with end-to-end encryption, built with React,
    ```
 
 3. Open http://localhost:3000 in your browser
+
+**Security Note**: First-time setup automatically creates an encrypted-by-default environment. All user communications are immediately protected with end-to-end encryption.
 
 The database schema is automatically created on first startup.
 

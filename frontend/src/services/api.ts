@@ -190,19 +190,20 @@ export const messageAPI = {
     channelId: number,
     messageData: SendMessageRequest
   ): Promise<ApiResponse<{ data: Message }>> => {
-    let processedData = { ...messageData };
-    
-    // Encrypt message content if encryption is enabled
-    if (encryptionService.isEncryptionReady()) {
-      const encrypted = encryptionService.encryptMessage(messageData.content, channelId);
-      processedData = {
-        ...messageData,
-        content: '[ENCRYPTED]', // Placeholder for server
-        encrypted_content: encrypted.encrypted_content,
-        is_encrypted: encrypted.is_encrypted,
-        encryption_version: String(encrypted.encryption_version)
-      };
+    // MANDATORY ENCRYPTION - Block unencrypted messages
+    if (!encryptionService.isEncryptionReady()) {
+      throw new Error('Cannot send message: Encryption not initialized. All messages must be encrypted.');
     }
+
+    // Encrypt message content - ALWAYS
+    const encrypted = encryptionService.encryptMessage(messageData.content, channelId);
+    const processedData = {
+      ...messageData,
+      content: '[ENCRYPTED]', // Placeholder for server
+      encrypted_content: encrypted.encrypted_content,
+      is_encrypted: encrypted.is_encrypted,
+      encryption_version: String(encrypted.encryption_version)
+    };
     
     const response = await api.post(`/messages/channels/${channelId}`, processedData);
     
@@ -225,16 +226,22 @@ export const messageAPI = {
   ): Promise<ApiResponse<{ data: Message }>> => {
     let processedData: EditMessageRequest = { content };
     
-    // Encrypt edited content if encryption is enabled and channelId is provided
-    if (encryptionService.isEncryptionReady() && channelId) {
-      const encrypted = encryptionService.encryptMessage(content, channelId);
-      processedData = {
-        content: '[ENCRYPTED]',
-        encrypted_content: encrypted.encrypted_content,
-        is_encrypted: encrypted.is_encrypted,
-        encryption_version: String(encrypted.encryption_version)
-      };
+    // MANDATORY ENCRYPTION for message editing
+    if (!encryptionService.isEncryptionReady()) {
+      throw new Error('Cannot edit message: Encryption not initialized. All message edits must be encrypted.');
     }
+    
+    if (!channelId) {
+      throw new Error('Channel ID required for encrypted message editing');
+    }
+
+    const encrypted = encryptionService.encryptMessage(content, channelId);
+    processedData = {
+      content: '[ENCRYPTED]',
+      encrypted_content: encrypted.encrypted_content,
+      is_encrypted: encrypted.is_encrypted,
+      encryption_version: String(encrypted.encryption_version)
+    };
     
     const response = await api.put(`/messages/${messageId}`, processedData);
     
@@ -306,24 +313,30 @@ export const dmAPI = {
   ): Promise<ApiResponse<{ data: DirectMessage }>> => {
     let messageData: any = { content, replyTo };
     
-    // Encrypt message content if encryption is enabled
-    if (encryptionService.isEncryptionReady()) {
-      try {
-        // Get current user ID (you'd need to get this from auth context)
-        const currentUserId = parseInt(localStorage.getItem('currentUserId') || '0');
-        const encrypted = encryptionService.encryptDirectMessage(content, currentUserId, receiverId);
-        
-        messageData = {
-          content: '[ENCRYPTED]', // Placeholder for server
-          encrypted_content: encrypted.encrypted_content,
-          is_encrypted: encrypted.is_encrypted,
-          encryption_version: String(encrypted.encryption_version),
-          replyTo
-        };
-      } catch (error) {
-        console.error('Failed to encrypt DM:', error);
-        // Fallback to unencrypted if encryption fails
+    // MANDATORY DM ENCRYPTION - Block unencrypted DMs
+    if (!encryptionService.isEncryptionReady()) {
+      throw new Error('Cannot send DM: Encryption not initialized. All messages must be encrypted.');
+    }
+
+    try {
+      // Get current user ID
+      const currentUserId = parseInt(localStorage.getItem('currentUserId') || '0');
+      if (!currentUserId) {
+        throw new Error('User ID not found - encryption cannot proceed');
       }
+      
+      const encrypted = encryptionService.encryptDirectMessage(content, currentUserId, receiverId);
+      
+      messageData = {
+        content: '[ENCRYPTED]', // Placeholder for server
+        encrypted_content: encrypted.encrypted_content,
+        is_encrypted: encrypted.is_encrypted,
+        encryption_version: String(encrypted.encryption_version),
+        replyTo
+      };
+    } catch (error) {
+      console.error('Failed to encrypt DM:', error);
+      throw new Error('Message encryption failed - cannot send unencrypted DM');
     }
     
     const response = await api.post(`/dm/send/${receiverId}`, messageData);
@@ -356,6 +369,11 @@ export const dmAPI = {
 
   markAsRead: async (conversationId: string): Promise<ApiResponse> => {
     const response = await api.put(`/dm/conversations/${conversationId}/read`);
+    return response.data;
+  },
+
+  deleteDirectMessage: async (messageId: number): Promise<ApiResponse> => {
+    const response = await api.delete(`/dm/messages/${messageId}`);
     return response.data;
   },
 };
